@@ -50,8 +50,11 @@ public class NewsParser{
                     reader.beginArray();
                     while (reader.hasNext()) {
                         reader.beginObject();
-                        if(reader.nextName().equals("name")) news.authors.add(reader.nextString());
-                        else reader.skipValue();
+                        while(reader.hasNext()) {
+                            if (reader.nextName().equals("name"))
+                                news.authors.add(reader.nextString());
+                            else reader.skipValue();
+                        }
                         reader.endObject();
                     }
                     reader.endArray();
