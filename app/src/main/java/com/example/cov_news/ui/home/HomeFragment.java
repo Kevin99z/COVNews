@@ -13,79 +13,50 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.cov_news.MainActivity;
 import com.example.cov_news.News;
-import com.example.cov_news.NewsParser;
 import com.example.cov_news.R;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
-    final String apiAddress = "https://covid-dashboard.aminer.cn/api/events/list";
     private ListView listView;
     ArrayAdapter<News> adapter; // todo: write a custom adapter
-    List<News> newsList;
     private HomeViewModel homeViewModel;
-
+    SwipeRefreshLayout mSwipeRefreshLayout;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
+        mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
+        adapter = new ArrayAdapter<News>(getActivity(),android.R.layout.simple_list_item_1, homeViewModel.getNewsList());
         listView = (ListView) root.findViewById(R.id.list_home);
-        refresh();
-        return root;
-    }
-    private void updateListView(){
-        adapter = new ArrayAdapter<News>(getActivity(),android.R.layout.simple_list_item_1,newsList);
         listView.setAdapter(adapter);
-    }
-    private void refresh(){
-        Thread t = new Thread(new Runnable(){
+        homeViewModel.getNewsFeed().observe(getViewLifecycleOwner(), new Observer<List<News>>() {
             @Override
-            public void run() {
-                try {
-                    int page = 1, size = 20;
-                    URL url = new URL(apiAddress+String.format("?type=%s&page=%d&size=%d","paper", page, size));
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setConnectTimeout(10000);
-                    conn.setReadTimeout(10000);
-                    conn.connect();
-//                    // 获取所有响应头字段
-//                    Map<String, List<String>> map = conn.getHeaderFields();
-//                    // 遍历所有的响应头字段
-//                    for (String key : map.keySet()) {
-//                        System.out.println(key + "--->" + map.get(key));
-//                    }
-                    if (conn.getResponseCode() == 200) {
-                        InputStream in = conn.getInputStream();
-                        newsList = NewsParser.readJsonStream(in);
-                        updateListView();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            public void onChanged(@Nullable List<News> newsFeed) {
+                if(newsFeed!=null)
+                    adapter.addAll(newsFeed);
             }
         });
-        t.start();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        update();
 
+        return root;
     }
+    // todo: 增加上拉获取新的新闻的功能
+    // todo: 下拉刷新全部新闻
+
+    private void update(){
+        homeViewModel.fetchNews();
+    }
+
+
 }
