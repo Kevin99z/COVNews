@@ -7,3 +7,5 @@
 - 看一下如何解析抓取的新闻
 - 考虑用SugarORM保存新闻对象
 - 研究一下分享的接口怎么用
+
+> 参考：https://github.com/Trinkle23897/simple-news-android-app

@@ -29,6 +29,11 @@ public class HomeViewModel extends ViewModel {
         newsFeed.setValue(newsList);
         page = 1;
     }
+    public void refresh(){
+        newsList.clear();
+        page = 1;
+        fetchNews();
+    }
     public LiveData<List<News>> getNewsFeed(){return newsFeed;}
     public List<News> getNewsList(){return newsList;}
 

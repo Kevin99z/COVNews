@@ -27,10 +27,21 @@ public class HomeFragment extends Fragment {
     SwipeRefreshLayout mSwipeRefreshLayout;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        //note: use getActivity() to keep homeViewModel the same throughout main activity
         homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
         mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        homeViewModel.refresh();
+                    }
+                }
+        );
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -43,8 +54,10 @@ public class HomeFragment extends Fragment {
         homeViewModel.getNewsFeed().observe(getViewLifecycleOwner(), new Observer<List<News>>() {
             @Override
             public void onChanged(@Nullable List<News> newsFeed) {
-                if(newsFeed!=null)
+                if(newsFeed!=null) {
                     adapter.addAll(newsFeed);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
         update();
@@ -52,7 +65,6 @@ public class HomeFragment extends Fragment {
         return root;
     }
     // todo: 增加上拉获取新的新闻的功能
-    // todo: 下拉刷新全部新闻
 
     private void update(){
         homeViewModel.fetchNews();
