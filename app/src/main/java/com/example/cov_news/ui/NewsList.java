@@ -1,7 +1,6 @@
 package com.example.cov_news.ui;
 
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
@@ -14,19 +13,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.cov_news.News;
 import com.example.cov_news.R;
-import com.example.cov_news.ui.home.HomeViewModel;
 
 import java.util.List;
 
 public class NewsList extends Fragment {
 
     private NewsListViewModel mViewModel;
-    private ListView listView;
+    private ListView mListView;
     ArrayAdapter<News> adapter; // todo: write a custom adapter
     SwipeRefreshLayout mSwipeRefreshLayout;
     String type;
@@ -42,6 +41,7 @@ public class NewsList extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.news_list_fragment, container, false);
         mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
+        mListView = root.findViewById(R.id.list);
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
@@ -52,7 +52,21 @@ public class NewsList extends Fragment {
                     }
                 }
         );
-        listView = root.findViewById(R.id.list_home);
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener(){
+            public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {
+            }
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState){
+                // 当不滚动时
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                    // 判断是否滚动到底部
+                    if (view.getLastVisiblePosition() == view.getCount() - 1) {
+                        //加载更多功能的代码
+                        mViewModel.fetchNews();
+                    }
+                }
+            }
+        });
         return root;
     }
 
@@ -62,7 +76,7 @@ public class NewsList extends Fragment {
         mViewModel = ViewModelProviders.of(this.getParentFragment().getActivity()).get(type, NewsListViewModel.class);
         mViewModel.setType(type);
         adapter = new ArrayAdapter<News>(getActivity(),android.R.layout.simple_list_item_1, mViewModel.getNewsList());
-        listView.setAdapter(adapter);
+        mListView.setAdapter(adapter);
         mViewModel.getNewsFeed().observe(getViewLifecycleOwner(), new Observer<List<News>>() {
             @Override
             public void onChanged(@Nullable List<News> newsFeed) {
@@ -72,8 +86,8 @@ public class NewsList extends Fragment {
                 }
             }
         });
+
         if(adapter.isEmpty())mViewModel.fetchNews();
     }
-    // todo: 增加上拉获取新的新闻的功能
 
 }
