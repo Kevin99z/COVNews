@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.cov_news.News;
 import com.example.cov_news.NewsParser;
+import com.orm.SugarRecord;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,9 +58,24 @@ public class NewsListViewModel extends ViewModel {
                     if (conn.getResponseCode() == 200) {
                         InputStream in = conn.getInputStream();
                         List<News> tmp= NewsParser.readJsonStream(in);
-                        newsList.addAll(tmp);
+                        in.close();
+                        int start = newsList.size()+100000;
+                        for(int i=1; i<=size; i++) {
+                            News item = tmp.get(i-1);
+                            item.setId((long) (i+start));
+                            item.save();
+                        }
                         newsFeed.postValue(tmp);
                         page++;
+                    }
+                    else{
+                        int start = newsList.size()+100000;
+                        List<News> tmp = new ArrayList<>();
+                        for(int i=1; i<=size; i++){
+                            News item = News.findById(News.class, i+start);
+                            tmp.add(item);
+                        }
+                        newsFeed.postValue(tmp);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

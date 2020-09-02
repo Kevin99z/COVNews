@@ -22,6 +22,8 @@ import android.widget.ListView;
 import com.example.cov_news.News;
 import com.example.cov_news.R;
 import com.example.cov_news.NewsItem;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewsList extends Fragment {
@@ -60,6 +62,7 @@ public class NewsList extends Fragment {
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
+//                        newsList.clear();
                         mViewModel.refresh();
                     }
                 }
@@ -89,17 +92,14 @@ public class NewsList extends Fragment {
         mViewModel.setType(type);
         adapter = new ArrayAdapter<News>(getActivity(),android.R.layout.simple_list_item_1, mViewModel.getNewsList());
         mListView.setAdapter(adapter);
-        mViewModel.getNewsFeed().observe(getViewLifecycleOwner(), new Observer<List<News>>() {
-            @Override
-            public void onChanged(@Nullable List<News> newsFeed) {
-                if(newsFeed!=null) {
-                    adapter.addAll(newsFeed);
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
+        mViewModel.getNewsFeed().observe(getViewLifecycleOwner(), data -> {
+            if(data!=null){
+                adapter.addAll(data);
+                adapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
 
         if(adapter.isEmpty())mViewModel.fetchNews();
     }
-
 }
