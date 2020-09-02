@@ -10,7 +10,19 @@ public class NotificationsViewModel extends ViewModel {
 
     public NotificationsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is notifications fragment");
+        mText.setValue("This is notifications fragment.\npublic class NotificationsViewModel extends ViewModel {\n" +
+                "\n" +
+                "    private MutableLiveData<String> mText;\n" +
+                "\n" +
+                "    public NotificationsViewModel() {\n" +
+                "        mText = new MutableLiveData<>();\n" +
+                "        mText.setValue(\"This is notifications fragment\");\n" +
+                "    }\n" +
+                "\n" +
+                "    public LiveData<String> getText() {\n" +
+                "        return mText;\n" +
+                "    }\n" +
+                "}");
     }
 
     public LiveData<String> getText() {

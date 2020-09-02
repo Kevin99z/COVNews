@@ -18,7 +18,7 @@ public class News extends SugarRecord {
 //    String id;
     ArrayList<String> authors=new ArrayList<>();
     Date date;
-
+    String[] labels;
     public String getContent() {
         return content;
     }

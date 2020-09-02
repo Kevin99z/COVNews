@@ -11,64 +11,67 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.cov_news.News;
 import com.example.cov_news.R;
+import com.example.cov_news.ui.NewsList;
+import com.google.android.material.tabs.TabLayout;
 
-import java.util.List;
+import java.util.*;
 
 public class HomeFragment extends Fragment {
     private ListView listView;
     ArrayAdapter<News> adapter; // todo: write a custom adapter
     private HomeViewModel homeViewModel;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    TabLayout mytab;
+    ViewPager mViewPager;
+    List<String> mTitle;
+    List<NewsList> mFragment;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        mytab = (TabLayout) root.findViewById(R.id.mytab);
+        mViewPager = (ViewPager) root.findViewById(R.id.mViewPager);
+        mytab.addTab(mytab.newTab().setText("选项卡一"));
+        mTitle = new ArrayList<>();
+        mTitle.add("news");
+        mTitle.add("paper");
+        mFragment = new ArrayList<>();
+        mFragment.add(new NewsList("news"));
+        mFragment.add(new NewsList("paper"));
+        mViewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager(),FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            @Override
+            public Fragment getItem(int position) {
+                return mFragment.get(position);
+            }
+
+            @Override
+            public int getCount() {
+                return mFragment.size();
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                return mTitle.get(position);
+            }
+        });
+        mytab.setupWithViewPager(mViewPager);
+
         //note: use getActivity() to keep homeViewModel the same throughout main activity
         homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
-        mSwipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        homeViewModel.refresh();
-                    }
-                }
-        );
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        adapter = new ArrayAdapter<News>(getActivity(),android.R.layout.simple_list_item_1, homeViewModel.getNewsList());
-        listView = (ListView) root.findViewById(R.id.list_home);
-        listView.setAdapter(adapter);
-        homeViewModel.getNewsFeed().observe(getViewLifecycleOwner(), new Observer<List<News>>() {
-            @Override
-            public void onChanged(@Nullable List<News> newsFeed) {
-                if(newsFeed!=null) {
-                    adapter.addAll(newsFeed);
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            }
-        });
-        update();
+//        final TextView textView = root.findViewById(R.id.text_home);
+
 
         return root;
     }
-    // todo: 增加上拉获取新的新闻的功能
 
-    private void update(){
-        homeViewModel.fetchNews();
-    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.example.cov_news;
 
+import android.annotation.SuppressLint;
 import android.util.JsonReader;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewsParser{
+    @SuppressLint("SimpleDateFormat")
     static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
     public static List<News> readJsonStream(InputStream in) throws IOException {
         JsonReader reader = new JsonReader(new InputStreamReader(in));
@@ -40,6 +42,19 @@ public class NewsParser{
 //                case "_id":
 //                    Long id = Long.parseUnsignedLong(reader.nextString(), 16);
 //                    break;
+                case "entities":
+                    reader.beginArray();
+                    while(reader.hasNext()){
+                        reader.beginObject();
+                        while(reader.hasNext()){
+                            if(reader.nextName().equals("label"))
+                                news.labels = reader.nextString().split(" ");
+                            else reader.skipValue();
+                        }
+                        reader.endObject();
+                    }
+                    reader.endArray();
+                    break;
                 case "content":
                     news.content = reader.nextString();
                     break;
