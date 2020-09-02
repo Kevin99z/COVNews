@@ -36,7 +36,7 @@ public class NewsListViewModel extends ViewModel {
     }
     public LiveData<List<News>> getNewsFeed(){return newsFeed;}
     public List<News> getNewsList(){return newsList;}
-
+    public News getNewsAt(int id){return newsList.get(id);}
     public void fetchNews(){
         Thread t = new Thread(new Runnable(){
             @Override

@@ -11,7 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class News extends SugarRecord {
+public class News extends SugarRecord implements Serializable {
     @Unique
     String content;
     String title;

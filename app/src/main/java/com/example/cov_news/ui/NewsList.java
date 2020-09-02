@@ -3,6 +3,7 @@ package com.example.cov_news.ui;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,16 +15,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.cov_news.News;
 import com.example.cov_news.R;
-
+import com.example.cov_news.NewsItem;
 import java.util.List;
 
 public class NewsList extends Fragment {
-
     private NewsListViewModel mViewModel;
     private ListView mListView;
     ArrayAdapter<News> adapter; // todo: write a custom adapter
@@ -42,6 +43,17 @@ public class NewsList extends Fragment {
         View root = inflater.inflate(R.layout.news_list_fragment, container, false);
         mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
         mListView = root.findViewById(R.id.list);
+        mListView.setOnItemClickListener(new AbsListView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Long id = mListView.getItemIdAtPosition(i);
+                System.out.println(id);
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), NewsItem.class);
+                intent.putExtra("news", mViewModel.getNewsAt(id.intValue()));
+                startActivity(intent);
+            }
+        });
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
