@@ -31,7 +31,6 @@ public class NewsListViewModel extends ViewModel {
     }
     public void setType(String type){this.type=type;}
     public void refresh(){
-        newsList.clear();
         page = 1;
         fetchNews();
     }

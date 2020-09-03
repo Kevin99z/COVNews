@@ -62,7 +62,8 @@ public class NewsList extends Fragment {
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-//                        newsList.clear();
+                        adapter.clear();
+                        adapter.notifyDataSetChanged();
                         mViewModel.refresh();
                     }
                 }
