@@ -38,6 +38,16 @@ public class NewsListViewModel extends ViewModel {
     public LiveData<List<News>> getNewsFeed(){return newsFeed;}
     public List<News> getNewsList(){return newsList;}
     public News getNewsAt(int id){return newsList.get(id);}
+    private void loadFromDatabase(){
+        int start = newsList.size()+100000;
+        List<News> tmp = new ArrayList<>();
+        for(int i=1; i<=size; i++){
+            News item = News.findById(News.class, (long)(i+start));
+            tmp.add(item);
+        }
+        newsFeed.postValue(tmp);
+        page++;
+    }
     public void fetchNews(){
         Thread t = new Thread(new Runnable(){
             @Override
@@ -63,22 +73,14 @@ public class NewsListViewModel extends ViewModel {
                         for(int i=1; i<=size; i++) {
                             News item = tmp.get(i-1);
                             item.setId((long) (i+start));
-                            item.save();
                         }
+                        SugarRecord.saveInTx(tmp);
                         newsFeed.postValue(tmp);
                         page++;
                     }
-                    else{
-                        int start = newsList.size()+100000;
-                        List<News> tmp = new ArrayList<>();
-                        for(int i=1; i<=size; i++){
-                            News item = News.findById(News.class, i+start);
-                            tmp.add(item);
-                        }
-                        newsFeed.postValue(tmp);
-                    }
+                    else loadFromDatabase();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    loadFromDatabase();
                 }
             }
         });
@@ -90,4 +92,5 @@ public class NewsListViewModel extends ViewModel {
 //        }
 
     }
+
 }

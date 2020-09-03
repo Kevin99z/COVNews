@@ -3,7 +3,6 @@ package com.example.cov_news;
 import android.util.JsonReader;
 
 import com.orm.SugarRecord;
-import com.orm.dsl.Unique;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -12,13 +11,15 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class News extends SugarRecord implements Serializable {
-    @Unique
     String content;
     String title;
 //    String id;
     ArrayList<String> authors=new ArrayList<>();
     Date date;
     String[] labels;
+    public News(){
+
+    }
     public String getContent() {
         return content;
     }

@@ -3,6 +3,7 @@
     package="com.example.cov_news">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -17,7 +18,7 @@
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <!-- for sugarORM -->
         <meta-data
-            android:name="DATABSE"
+            android:name="DATABASE"
             android:value="news.db" />
         <meta-data
             android:name="VERSION"
