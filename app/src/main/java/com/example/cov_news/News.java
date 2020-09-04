@@ -1,13 +1,7 @@
 package com.example.cov_news;
-
-import android.util.JsonReader;
-
 import com.orm.SugarRecord;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class News extends SugarRecord implements Serializable {

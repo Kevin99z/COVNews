@@ -48,39 +48,36 @@ public class NewsListViewModel extends ViewModel {
         page++;
     }
     public void fetchNews(){
-        Thread t = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(apiAddress+String.format("?type=%s&page=%d&size=%d", type, page, size));
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setConnectTimeout(10000);
-                    conn.setReadTimeout(10000);
-                    conn.connect();
+        Thread t = new Thread(() -> {
+            try {
+                URL url = new URL(apiAddress+String.format("?type=%s&page=%d&size=%d", type, page, size));
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.connect();
 //                    // 获取所有响应头字段
 //                    Map<String, List<String>> map = conn.getHeaderFields();
 //                    // 遍历所有的响应头字段
 //                    for (String key : map.keySet()) {
 //                        System.out.println(key + "--->" + map.get(key));
 //                    }
-                    if (conn.getResponseCode() == 200) {
-                        InputStream in = conn.getInputStream();
-                        List<News> tmp= NewsParser.readJsonStream(in);
-                        in.close();
-                        int start = newsList.size()+100000;
-                        for(int i=1; i<=size; i++) {
-                            News item = tmp.get(i-1);
-                            item.setId((long) (i+start));
-                        }
-                        SugarRecord.saveInTx(tmp);
-                        newsFeed.postValue(tmp);
-                        page++;
+                if (conn.getResponseCode() == 200) {
+                    InputStream in = conn.getInputStream();
+                    List<News> tmp= NewsParser.readJsonStream(in);
+                    in.close();
+                    int start = newsList.size()+100000;
+                    for(int i=1; i<=size; i++) {
+                        News item = tmp.get(i-1);
+                        item.setId((long) (i+start));
                     }
-                    else loadFromDatabase();
-                } catch (IOException e) {
-                    loadFromDatabase();
+                    newsFeed.postValue(tmp);
+                    SugarRecord.saveInTx(tmp);
+                    page++;
                 }
+                else loadFromDatabase();
+            } catch (IOException e) {
+                loadFromDatabase();
             }
         });
         t.start();
