@@ -1,14 +1,9 @@
 package com.example.cov_news.ui.dashboard;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,32 +15,24 @@ import androidx.lifecycle.ViewModelProviders;
 import com.anychart.APIlib;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
-import com.anychart.charts.Pie;
 import com.anychart.data.Set;
 import com.anychart.enums.ScaleStackMode;
 import com.bin.david.form.core.SmartTable;
-import com.bin.david.form.data.CellInfo;
-import com.bin.david.form.data.column.Column;
-import com.bin.david.form.data.format.draw.IDrawFormat;
-import com.bin.david.form.data.table.MapTableData;
 import com.bin.david.form.core.TableConfig;
+import com.example.cov_news.ProvInfo;
 import com.example.cov_news.R;
-import com.example.cov_news.JsonHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
 
     private DashboardViewModel dashboardViewModel;
     private AnyChartView chartView;
+    private SmartTable<ProvInfo> table;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         dashboardViewModel = ViewModelProviders.of(getActivity()).get(DashboardViewModel.class);
@@ -64,6 +51,13 @@ public class DashboardFragment extends Fragment {
         chart.column(set.mapAs("{ x: 'x', value: 'death' }")).tooltip().format("死亡: {%value}");
         chart.column(set.mapAs("{ x: 'x', value: 'active' }")).tooltip().format("现存: {%value}");
         chartView.setChart(chart);
+        table = root.findViewById(R.id.table);
+        TableConfig config = table.getConfig();
+        config.setShowXSequence(false);
+        config.setShowYSequence(false);
+        dashboardViewModel.getProvInfo().observe(getViewLifecycleOwner(), data->{
+            table.setData(data);
+        });
         dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -86,8 +80,8 @@ public class DashboardFragment extends Fragment {
             set.data(seriesData);
         });
 
-        dashboardViewModel.fetchData();
-
+        dashboardViewModel.fetchGlobalData();
+        dashboardViewModel.fetchChinaData();
         return root;
     }
 }
