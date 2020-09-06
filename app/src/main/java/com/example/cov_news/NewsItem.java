@@ -12,6 +12,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class NewsItem extends AppCompatActivity {
     News news;
     private TextView mHeader;
@@ -30,6 +32,8 @@ public class NewsItem extends AppCompatActivity {
         if (news != null) {
             mHeader.setText(news.getTitle());
             mBody.setText(news.getContent());
+            mBody.append("\n\n Authors: " + news.getAuthors().size());
+            mBody.append("\n\n Date: " + news.getDate());
         }
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

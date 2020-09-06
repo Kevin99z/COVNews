@@ -1,4 +1,6 @@
 package com.example.cov_news;
+import android.util.Log;
+
 import com.orm.SugarRecord;
 
 import java.io.*;
@@ -7,9 +9,10 @@ import java.util.*;
 public class News extends SugarRecord implements Serializable {
     String content;
     String title;
+    ArrayList<String> authors = new ArrayList<>();
 //    String id;
-    ArrayList<String> authors=new ArrayList<>();
-    Date date;
+
+    String date;
     String[] labels;
     public News(){
 
@@ -26,7 +29,7 @@ public class News extends SugarRecord implements Serializable {
         return authors;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
     @Override

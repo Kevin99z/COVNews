@@ -2,6 +2,7 @@ package com.example.cov_news;
 
 import android.annotation.SuppressLint;
 import android.util.JsonReader;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,24 +63,24 @@ public class NewsParser{
                     news.title = reader.nextString();
                     break;
                 case "authors":
+                    ArrayList<String> authorsThis=new ArrayList<>();
                     reader.beginArray();
                     while (reader.hasNext()) {
                         reader.beginObject();
                         while(reader.hasNext()) {
-                            if (reader.nextName().equals("name"))
-                                news.authors.add(reader.nextString());
+                            if (reader.nextName().equals("name")) {
+                                authorsThis.add(reader.nextString());
+                            }
                             else reader.skipValue();
                         }
                         reader.endObject();
                     }
                     reader.endArray();
+                    news.authors = authorsThis;
+                    Log.i("NewsParser", String.valueOf("Authors list size: " + news.authors.size()));
                     break;
-                case "time":
-                    try {
-                        news.date = dateFormat.parse(reader.nextString());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                case "date":
+                    news.date = reader.nextString();
                     break;
                 default:
                     reader.skipValue();
