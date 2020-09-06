@@ -21,28 +21,29 @@
                     android:text="世界疫情"
                     >
                 </TextView>
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true"
-            android:measureAllChildren="false"
-            >
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-        <com.anychart.AnyChartView
-            android:id="@+id/chart"
-            android:layout_width="4000dp"
-            android:layout_height="300dp"
-            android:layout_marginBottom="50dp"
-            />
-                </LinearLayout>
-<!--        <com.bin.david.form.core.SmartTable-->
-<!--            android:id="@+id/table"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            />-->
-        </HorizontalScrollView>
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fillViewport="true"
+                    android:measureAllChildren="false"
+                    >
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                                <com.anychart.AnyChartView
+                                    android:id="@+id/chart"
+                                    android:layout_width="4000dp"
+                                    android:layout_height="300dp"
+                                    android:layout_marginBottom="50dp"
+                                    />
+                        </LinearLayout>
+
+                </HorizontalScrollView>
+                <com.bin.david.form.core.SmartTable
+                        android:layout_height="1000dp"
+                        android:layout_width="match_parent"
+                        android:id="@+id/table"
+                        />
                 </LinearLayout>
         </ScrollView>
 
