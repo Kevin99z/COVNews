@@ -1,92 +1,170 @@
 package com.example.cov_news.ui;
 
-import androidx.lifecycle.LiveData;
+import android.widget.ProgressBar;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.cov_news.News;
-import com.example.cov_news.NewsParser;
-import com.orm.SugarRecord;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class NewsListViewModel extends ViewModel {
+    private ArrayList<Integer> pagination;
     final String apiAddress = "https://covid-dashboard.aminer.cn/api/events/list";
     private int page;
+    private NewsModel dataModel;
     String type;
-    int size = 20;
+    final int size = 20;
+    int onDisplay = 0;
+    MutableLiveData<List<News>> newsList;// the whole news list
     MutableLiveData<List<News>> newsFeed;//the newly fetched news
-    List<News> newsList;// the whole news list
+
+    public MutableLiveData<List<News>> getNewsList() {
+        return newsList;
+    }
+
+
+    List<News> records; // offline records
     // TODO: Implement the ViewModel
     public NewsListViewModel(){
-        newsFeed = new MutableLiveData<>();
-        newsList = new ArrayList<News>();
-        newsFeed.setValue(newsList);
+
+//        newsFeed = new MutableLiveData<>();
+//        newsList = new ArrayList<News>();
+//        newsFeed.setValue(newsList);
         page = 1;
+        pagination = new ArrayList<Integer>(Arrays.asList(1,0,0));
+        newsList = new MutableLiveData<>();
     }
-    public void setType(String type){this.type=type;}
+
+    public void init(String type){this.type=type; dataModel=new NewsModel(type);}
     public void refresh(){
         page = 1;
-        fetchNews();
+        onDisplay = 0;
+        fetchNews(true);
     }
-    public LiveData<List<News>> getNewsFeed(){return newsFeed;}
-    public List<News> getNewsList(){return newsList;}
-    public News getNewsAt(int id){return newsList.get(id);}
-    private void loadFromDatabase(){
-        int start = newsList.size()+100000;
-        List<News> tmp = new ArrayList<>();
-        for(int i=1; i<=size; i++){
-            News item = News.findById(News.class, (long)(i+start));
-            tmp.add(item);
-        }
-        newsFeed.postValue(tmp);
-        page++;
-    }
-    public void fetchNews(){
-        Thread t = new Thread(() -> {
-            try {
-                URL url = new URL(apiAddress+String.format("?type=%s&page=%d&size=%d", type, page, size));
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(10000);
-                conn.connect();
-//                    // 获取所有响应头字段
-//                    Map<String, List<String>> map = conn.getHeaderFields();
-//                    // 遍历所有的响应头字段
-//                    for (String key : map.keySet()) {
-//                        System.out.println(key + "--->" + map.get(key));
+//    public LiveData<List<News>> getNewsFeed(){return newsFeed;}
+//    public List<News> getNewsList(){return newsList;}
+//    public News getNewsAt(int pos){return newsList.get(pos);}
+//    private void loadFromDatabase(){
+//        //todo: add field timestamp
+//        if(records==null) records = News.listAll(News.class, "date DESC");
+//        int start = newsList.size();
+//        List<News> tmp = new ArrayList<>();
+////        for(int i=1; i<=size; i++){
+////            News item = News.findById(News.class, (long)(i+start));
+////            tmp.add(item);
+////        }
+//        newsFeed.postValue(records.subList(start, start+size));
+//        page++;
+//    }
+//    public void readNews(long id){
+//        SugarRecord.findById(News.class, id).read();
+//    }
+    public void fetchNews(Boolean update){
+//        Thread t = new Thread(() -> {
+//            try {
+//                @SuppressLint("DefaultLocale")
+//                URL url = new URL(apiAddress+String.format("?type=%s&page=%d&size=%d", type, page, size));
+//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                conn.setRequestMethod("GET");
+//                conn.setConnectTimeout(10000);
+//                conn.setReadTimeout(10000);
+//                conn.connect();
+//                if (conn.getResponseCode() == 200) {
+//                    InputStream in = conn.getInputStream();
+//                    List<News> input= NewsParser.readJsonStream(in, pagination);
+//                    in.close();
+////                    int start = newsList.size()+100000;
+//                    List<News> new_news = new ArrayList<>();
+//                    for(int i=1; i<=size; i++) {
+//                        News item = input.get(i-1);
+//                        News tmp = SugarRecord.findById(News.class, item.getId());
+//                        if(tmp==null)
+//                            new_news.add(item);
+//                        else if(tmp.getDate()==item.getDate()&&tmp.isRead())
+//                            item.read();
 //                    }
-                if (conn.getResponseCode() == 200) {
-                    InputStream in = conn.getInputStream();
-                    List<News> tmp= NewsParser.readJsonStream(in);
-                    in.close();
-                    int start = newsList.size()+100000;
-                    for(int i=1; i<=size; i++) {
-                        News item = tmp.get(i-1);
-                        item.setId((long) (i+start));
-                    }
-                    newsFeed.postValue(tmp);
-                    SugarRecord.saveInTx(tmp);
-                    page++;
-                }
-                else loadFromDatabase();
-            } catch (IOException e) {
-                loadFromDatabase();
-            }
-        });
-        t.start();
+//                    newsFeed.postValue(input);
+//                    SugarRecord.saveInTx(new_news);
+//                    page++;
+//                }
+//                else loadFromDatabase();
+//            } catch (IOException e) {
+//                loadFromDatabase();
+//            }
+//        });
+//        t.start();
 //        try {
 //            t.join();
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
+        if(page>1)onDisplay = newsList.getValue().size();
+        if((page-1)*size > onDisplay) {
+            if(!update) return; // when all news are fetched
+            else {//note: this is used after search
+                Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, (page-1)*size)));
+                t.start();
+                return;
+            }
+        }
+        if(update) dataModel.update();
 
+        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, onDisplay+size)));
+        t.start();
+        page++;
     }
+    public void search(CharSequence text, ProgressBar bar) {
+//        Thread t = new Thread(()-> dataModel.search(text, newsList));
+//        t.start();
+        SearchAsyncTask asyncTask = new SearchAsyncTask(bar, newsList, dataModel);
+        asyncTask.execute(text.toString());
+    }
+    public void getMoreNews(Boolean loading){
+        if(!loading) {
+            FetchAsyncTask asyncTask = new FetchAsyncTask(this, loading);
+            asyncTask.execute();
+        }
+    }
+
+    //        page = 1;
+//
+//        @SuppressLint("DefaultLocale")
+//        Thread t = new Thread(()->{
+//            try {
+//                List<News> results = new ArrayList<>();
+//                boolean finished = false;
+//                while(!finished){
+//                    URL url = new URL(apiAddress+String.format("?type=%s&page=%d&size=%d", type, page, size));
+//                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                    conn.setRequestMethod("GET");
+//                    conn.setConnectTimeout(10000);
+//                    conn.setReadTimeout(10000);
+//                    conn.connect();
+//                    if (conn.getResponseCode() == 200) {
+//                        InputStream in = conn.getInputStream();
+//                        List<News> input = NewsParser.readJsonStream(in, pagination);
+//                        if(pagination.get(2)==page) finished = true;
+//                        in.close();
+//    //                    int start = newsList.size()+100000;
+//                        for (int i = 1; i <= size; i++) {
+//                            News item = input.get(i - 1);
+//                            if (item.getTitle().contains(text) || item.getContent().contains(text))
+//                                results.add(item);
+//                        }
+//                        newsFeed.postValue(results);
+//                        page++;
+//                }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//        });
+//        t.start();
+//    }
 
 }

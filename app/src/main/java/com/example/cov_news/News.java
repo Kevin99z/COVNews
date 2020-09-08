@@ -1,35 +1,45 @@
 package com.example.cov_news;
-import android.util.Log;
 
 import com.orm.SugarRecord;
 
 import java.io.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class News extends SugarRecord implements Serializable {
     String content;
     String title;
-    ArrayList<String> authors = new ArrayList<>();
-//    String id;
+    public String getSource() {
+        return source;
+    }
 
-    String date;
-    String[] labels;
+    String source;
+    boolean read;
+
+    public String getLongId() {
+        return _id;
+    }
+
+    String _id;
+
+    long date;
     public News(){
-
+        read = false;
     }
     public String getContent() {
         return content;
     }
-
+    public void read(){
+        read = true;
+    }
+    public boolean isRead(){
+        return read;
+    }
     public String getTitle() {
         return title;
     }
 
-    public ArrayList<String> getAuthors() {
-        return authors;
-    }
-
-    public String getDate() {
+    public long getDate() {
         return date;
     }
     @Override

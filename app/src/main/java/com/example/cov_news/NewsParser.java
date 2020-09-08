@@ -2,21 +2,29 @@ package com.example.cov_news;
 
 import android.annotation.SuppressLint;
 import android.util.JsonReader;
-import android.util.Log;
+
+import com.anychart.scales.DateTime;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class NewsParser{
     @SuppressLint("SimpleDateFormat")
-    static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-    public static List<News> readJsonStream(InputStream in) throws IOException {
+    private static DateTimeFormatter dateFormat = DateTimeFormatter.RFC_1123_DATE_TIME;
+    public static List<News> readJsonStream(InputStream in, List<Integer> pagination) throws IOException {
         JsonReader reader = new JsonReader(new InputStreamReader(in));
         reader.beginObject();
         ArrayList<News> newsList = new ArrayList<>();
@@ -29,7 +37,17 @@ public class NewsParser{
                     newsList.add(readNews(reader));
                 }
                 reader.endArray();
-            } else reader.skipValue();
+            } else if(name.equals("pagination")){
+                reader.beginObject();
+                while(reader.hasNext()){
+                    String name2 = reader.nextName();
+                    if(name2.equals("page")) pagination.set(0, reader.nextInt());
+                    else if(name2.equals("size")) pagination.set(1, reader.nextInt());
+                    else pagination.set(2,reader.nextInt());
+                }
+                reader.endObject();
+            }
+                else reader.skipValue();
         }
         reader.endObject();
         return newsList;
@@ -40,24 +58,33 @@ public class NewsParser{
         while(reader.hasNext()){
             String name = reader.nextName();
             switch (name) {
-//                case "_id":
-//                    Long id = Long.parseUnsignedLong(reader.nextString(), 16);
-//                    break;
+                case "_id":
+                    news._id = reader.nextString();
+                    news.setId(Long.parseUnsignedLong(news._id.substring(8), 16));
+                    break;
                 case "entities":
                     reader.beginArray();
                     while(reader.hasNext()){
                         reader.beginObject();
                         while(reader.hasNext()){
                             if(reader.nextName().equals("label"))
-                                news.labels = reader.nextString().split(" ");
+                                reader.nextString();
+//                                news.labels = reader.nextString().split(" ");
                             else reader.skipValue();
                         }
                         reader.endObject();
                     }
                     reader.endArray();
                     break;
+                case "source":
+                    news.source = reader.nextString();
+                    break;
                 case "content":
-                    news.content = reader.nextString();
+                    try {
+                        news.content = reader.nextString();
+                    } catch(StackOverflowError e){
+                        e.printStackTrace();
+                    }
                     break;
                 case "title":
                     news.title = reader.nextString();
@@ -76,11 +103,16 @@ public class NewsParser{
                         reader.endObject();
                     }
                     reader.endArray();
-                    news.authors = authorsThis;
-                    Log.i("NewsParser", String.valueOf("Authors list size: " + news.authors.size()));
+//                    news.authors = authorsThis;
+//                    Log.i("NewsParser", String.valueOf("Authors list size: " + news.authors.size()));
                     break;
                 case "date":
-                    news.date = reader.nextString();
+                    try {
+                        LocalDateTime date= LocalDateTime.from(dateFormat.parse(reader.nextString()));
+                        news.date = date.toEpochSecond(ZoneOffset.UTC);
+                    } catch (DateTimeParseException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     reader.skipValue();
