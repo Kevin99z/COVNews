@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class NewsListViewModel extends ViewModel {
     private ArrayList<Integer> pagination;
     final String apiAddress = "https://covid-dashboard.aminer.cn/api/events/list";
@@ -43,7 +45,8 @@ public class NewsListViewModel extends ViewModel {
     public void refresh(){
         page = 1;
         onDisplay = 0;
-        fetchNews(true);
+        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, size)));
+        t.start();
     }
 //    public LiveData<List<News>> getNewsFeed(){return newsFeed;}
 //    public List<News> getNewsList(){return newsList;}
@@ -102,7 +105,7 @@ public class NewsListViewModel extends ViewModel {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        if(page>1)onDisplay = newsList.getValue().size();
+        if(newsList.getValue()!=null)onDisplay = newsList.getValue().size();
         if((page-1)*size > onDisplay) {
             if(!update) return; // when all news are fetched
             else {//note: this is used after search
@@ -113,7 +116,9 @@ public class NewsListViewModel extends ViewModel {
         }
         if(update) dataModel.update();
 
-        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, onDisplay+size)));
+        Thread t = new Thread(()-> {
+            newsList.postValue(dataModel.getNews(0, onDisplay+size));
+        });
         t.start();
         page++;
     }

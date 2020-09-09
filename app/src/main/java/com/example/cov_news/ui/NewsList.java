@@ -27,6 +27,8 @@ import android.widget.TextView;
 
 import com.example.cov_news.R;
 
+import static java.lang.Thread.sleep;
+
 public class NewsList extends Fragment {
     private NewsListViewModel mViewModel;
     private RecyclerView list;
@@ -72,8 +74,8 @@ public class NewsList extends Fragment {
                     // This method performs the actual data-refresh operation.
                     // The method calls setRefreshing(false) when it's finished.
             if(searching || loading) return;
-                    adapter.clear();
-                    mViewModel.refresh();
+//                    adapter.clear();
+            mViewModel.refresh();
                 }
         );
         list.addOnScrollListener(new RecyclerView.OnScrollListener(){
@@ -146,7 +148,7 @@ public class NewsList extends Fragment {
         //note: init button click listener
         button.setOnClickListener(view -> {//todo:rewrite search logic
             searching = false;
-            adapter.clear();
+//            adapter.clear();
             mViewModel.fetchNews(true);
             button.setVisibility(View.INVISIBLE);
             button.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -157,7 +159,7 @@ public class NewsList extends Fragment {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH||keyEvent!=null&&keyEvent.getKeyCode()==KeyEvent.KEYCODE_ENTER) {
                     NewsList.this.hideKeyboard(v);
                     if(!searching) {
-                        adapter.clear();
+//                        adapter.clear();
                         searching = true;
                         mViewModel.search(v.getText(), mProgressBar);
                         button.setVisibility(View.VISIBLE);
