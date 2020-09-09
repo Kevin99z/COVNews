@@ -17,7 +17,7 @@ public class ProvInfo extends SugarRecord {
     }
     @SmartColumn(id=1, name="省份")
     private String name;
-    @SmartColumn(id=2, name="确证病例")
+    @SmartColumn(id=2, name="确诊病例")
     private String confirmed;
     @SmartColumn(id=3, name="死亡病例")
     private String death;
