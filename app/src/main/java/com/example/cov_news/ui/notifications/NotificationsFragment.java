@@ -1,6 +1,8 @@
 package com.example.cov_news.ui.notifications;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
@@ -11,11 +13,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +32,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cov_news.R;
+import com.example.cov_news.queryInfo;
 import com.example.cov_news.ui.NewsList;
 
 import java.io.IOException;
@@ -32,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class NotificationsFragment extends Fragment {
 
@@ -40,35 +49,44 @@ public class NotificationsFragment extends Fragment {
     private Button button;
     private ProgressBar mProgressBar;
     private Editable query;
+    private ArrayList<String> queryList = new ArrayList<String>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         notificationsViewModel =
                 ViewModelProviders.of(this).get(NotificationsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        ListView listView = root.findViewById(R.id.list_view);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(root.getContext(), android.R.layout.simple_list_item_1, queryList);
+        listView.setAdapter(arrayAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
+                Intent intent = new Intent(getContext(), queryInfo.class);
+                intent.putExtra("Query", listView.getItemAtPosition(i).toString());
+                startActivity(intent);
             }
         });
         editText = root.findViewById(R.id.TEXT);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH||keyEvent!=null&&keyEvent.getKeyCode()==KeyEvent.KEYCODE_ENTER) {
-                    textView.setText("");
                     query = editText.getText();
-                    searchQuery(String.valueOf(query), textView);
+                    queryList.clear();
+                    searchQuery(String.valueOf(query));
+                    InputMethodManager manager = (InputMethodManager) root.getContext()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    manager.hideSoftInputFromWindow(root.getWindowToken(), 0);
                     return true;
                 }
                 return false;
             }
         });
+
         return root;
     }
 
-    public void searchQuery(String query, TextView textView){ //搜索所查词语
+    public void searchQuery(String query){ //搜索所查词语
         Thread t = new Thread(() -> {
         try {
             String apiAddress = "https://innovaapi.aminer.cn/covid/api/v1/pneumonia/entityquery?entity=";
@@ -81,7 +99,7 @@ public class NotificationsFragment extends Fragment {
             conn.connect();
             if (conn.getResponseCode() == 200) {
                 InputStream in = conn.getInputStream();
-                parse(in, textView);
+                parse(in);
                 in.close();
             }
             } catch (IOException e) {
@@ -96,7 +114,7 @@ public class NotificationsFragment extends Fragment {
         }
     }
 
-    public void parse(InputStream in, TextView textView) throws IOException { //找到词语信息后读取
+    public void parse(InputStream in) throws IOException { //找到词语信息后读取
         JsonReader reader = new JsonReader(new InputStreamReader(in));
         reader.beginObject();
         while(reader.hasNext()){
@@ -106,7 +124,7 @@ public class NotificationsFragment extends Fragment {
                     reader.beginObject();
                     while(reader.hasNext()) {
                         if (reader.nextName().equals("label")) {
-                            textView.append(reader.nextString() + "\n");
+                            queryList.add(reader.nextString());
                         } else {
                             reader.skipValue();
                         }

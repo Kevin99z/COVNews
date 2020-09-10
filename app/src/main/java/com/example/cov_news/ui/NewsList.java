@@ -32,7 +32,7 @@ import static java.lang.Thread.sleep;
 public class NewsList extends Fragment {
     private NewsListViewModel mViewModel;
     private RecyclerView list;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
     private EditText editText;
     private Button button;
     private ProgressBar mProgressBar;
@@ -64,8 +64,8 @@ public class NewsList extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         View root = inflater.inflate(R.layout.news_list_fragment, container, false);
+        mLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
         mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
         mProgressBar = root.findViewById(R.id.progress_bar);
         list = root.findViewById(R.id.list);
@@ -74,7 +74,7 @@ public class NewsList extends Fragment {
                     // This method performs the actual data-refresh operation.
                     // The method calls setRefreshing(false) when it's finished.
             if(loading) {
-                Toast.makeText(getActivity(), "Loading...", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "已经在加载中", Toast.LENGTH_LONG).show();
             }
 //                    adapter.clear();
             else if(searching) {
@@ -86,7 +86,7 @@ public class NewsList extends Fragment {
         list.addOnScrollListener(new RecyclerView.OnScrollListener(){
             public void onScrollStateChanged(@NonNull RecyclerView view, int scrollState){
                 super.onScrollStateChanged(view, scrollState);
-                if(!view.canScrollVertically(1)&&!searching&&!loading){
+                if(mLayoutManager.findLastVisibleItemPosition()==adapter.getItemCount()-1&&!searching&&!loading){
                     mViewModel.fetchNews(adapter.getItemCount());
 //                    mViewModel.getMoreNews(loading);
                 }
@@ -104,7 +104,7 @@ public class NewsList extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this.getParentFragment().getActivity()).get(type, NewsListViewModel.class);
         mViewModel.init(type);
-        adapter = new MyAdapter(getContext());
+        adapter = new MyAdapter(getContext(), mViewModel);
         list.setAdapter(adapter);
         //note: bind adapter and data
         mViewModel.getNewsList().observe(getViewLifecycleOwner(), data -> {

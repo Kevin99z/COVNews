@@ -11,12 +11,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
+
+        <activity android:name=".queryInfo"></activity>
         <activity
             android:name=".NewsItem"
             android:label="@string/title_activity_news_item"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <!-- for sugarORM -->
+            android:theme="@style/AppTheme.NoActionBar" /> <!-- for sugarORM -->
         <meta-data
             android:name="DATABASE"
             android:value="news.db" />

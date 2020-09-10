@@ -3,15 +3,21 @@ package com.example.cov_news;
 import com.orm.SugarRecord;
 
 import java.io.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class News extends SugarRecord implements Serializable {
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     String content;
     String title;
     public String type;
     public String getSource() {
         return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     String source;
@@ -23,7 +29,21 @@ public class News extends SugarRecord implements Serializable {
 
     String _id;
 
-    long date;
+    public void setStamp(long stamp) {
+        this.stamp = stamp;
+    }
+
+    long stamp;
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    long time;
     public News(){
         read = false;
     }
@@ -40,8 +60,8 @@ public class News extends SugarRecord implements Serializable {
         return title;
     }
 
-    public long getDate() {
-        return date;
+    public long getStamp() {
+        return stamp;
     }
     @Override
     public String toString() {

@@ -69,7 +69,10 @@ public class NewsListViewModel extends ViewModel {
 //    }
 
     public void initNews(){//todo:consider do update
-        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, page*size)));
+        Thread t = new Thread(()-> {
+            dataModel.loadNewsFromDataBase();
+            newsList.postValue(dataModel.getNews(0, page*size));
+        });
         t.start();
     }
     public void fetchNews(int onDisplay){
@@ -186,5 +189,7 @@ public class NewsListViewModel extends ViewModel {
 //        });
 //        t.start();
 //    }
-
+    public void getNewsContent(News news){
+        dataModel.getContent(news);
+    }
 }
