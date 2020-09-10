@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.cov_news"
-        minSdkVersion 25
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -54,5 +54,5 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.github.huangyanbin:SmartTable:2.2.0'
     implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
-    compile 'com.sina.weibo.sdk:core:4.4.3:openDefaultRelease@aar'
+    implementation 'com.sina.weibo.sdk:core:4.4.3:openDefaultRelease@aar'
 }

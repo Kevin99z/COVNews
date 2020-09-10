@@ -39,6 +39,12 @@ class SearchAsyncTask extends AsyncTask<String, Integer, Void> {
     }
 
     @Override
+    protected void onCancelled() {
+        super.onCancelled();
+        dataModel.stopSearch();
+    }
+
+    @Override
     protected void onProgressUpdate(Integer... values) {
         progressBar.setProgress(values[0]);
     }

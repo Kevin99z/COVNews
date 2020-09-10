@@ -21,6 +21,7 @@ public class NewsListViewModel extends ViewModel {
     String type;
     final int size = 20;
     int onDisplay = 0;
+    SearchAsyncTask searchTask;
     MutableLiveData<List<News>> newsList;// the whole news list
     MutableLiveData<List<News>> newsFeed;//the newly fetched news
 
@@ -42,12 +43,12 @@ public class NewsListViewModel extends ViewModel {
     }
 
     public void init(String type){this.type=type; dataModel=new NewsModel(type);}
-    public void refresh(){
-        page = 1;
-        onDisplay = 0;
-        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, size)));
-        t.start();
-    }
+//    public void refresh(){
+//        page = 1;
+//        onDisplay = 0;
+//        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, size)));
+//        t.start();
+//    }
 //    public LiveData<List<News>> getNewsFeed(){return newsFeed;}
 //    public List<News> getNewsList(){return newsList;}
 //    public News getNewsAt(int pos){return newsList.get(pos);}
@@ -66,6 +67,16 @@ public class NewsListViewModel extends ViewModel {
 //    public void readNews(long id){
 //        SugarRecord.findById(News.class, id).read();
 //    }
+
+    public void initNews(){//todo:consider do update
+        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, page*size)));
+        t.start();
+    }
+    public void fetchNews(int onDisplay){
+        Thread t = new Thread(()-> newsList.postValue(dataModel.getNews(0, onDisplay+size)));
+        t.start();
+        page++;
+    }
     public void fetchNews(Boolean update){
 //        Thread t = new Thread(() -> {
 //            try {
@@ -125,15 +136,19 @@ public class NewsListViewModel extends ViewModel {
     public void search(CharSequence text, ProgressBar bar) {
 //        Thread t = new Thread(()-> dataModel.search(text, newsList));
 //        t.start();
-        SearchAsyncTask asyncTask = new SearchAsyncTask(bar, newsList, dataModel);
-        asyncTask.execute(text.toString());
+        searchTask = new SearchAsyncTask(bar, newsList, dataModel);
+        searchTask.execute(text.toString());
     }
-    public void getMoreNews(Boolean loading){
-        if(!loading) {
-            FetchAsyncTask asyncTask = new FetchAsyncTask(this, loading);
-            asyncTask.execute();
-        }
+    public void stopSearch(){
+        if(searchTask!=null) searchTask.cancel(true);
     }
+//    public void getMoreNews(Boolean loading){
+//        fetchNews();
+//        if(!loading) {
+//            InitAsyncTask asyncTask = new InitAsyncTask(this, loading);
+//            asyncTask.execute();
+//        }
+//    }
 
     //        page = 1;
 //

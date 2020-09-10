@@ -3,18 +3,19 @@ package com.example.cov_news.ui;
 import android.os.AsyncTask;
 
 @SuppressWarnings("deprecation")
-class FetchAsyncTask extends AsyncTask<Boolean, Integer, Object> {
+class InitAsyncTask extends AsyncTask<Boolean, Integer, Object> {
     private NewsListViewModel viewModel;
     private Boolean loading;
     private NewsList listView;
-    public FetchAsyncTask(NewsListViewModel viewModel, Boolean loading) {
+    public InitAsyncTask(NewsListViewModel viewModel, Boolean loading) {
         this.viewModel = viewModel;
         this.loading = loading;
     }
 
     @Override
     protected Boolean doInBackground(Boolean... booleans) {
-        viewModel.fetchNews(booleans.length>0?booleans[0]:false);
+//        viewModel.fetchNews(booleans.length>0?booleans[0]:false);
+        viewModel.initNews();
         return true;
     }
 

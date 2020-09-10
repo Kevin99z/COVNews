@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 public class News extends SugarRecord implements Serializable {
     String content;
     String title;
+    public String type;
     public String getSource() {
         return source;
     }
