@@ -64,20 +64,19 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(position==0) return;
         News news = mData.get(position-1);
-        if(news.isRead()) holder.setRead();
         holder.tv.setText(news.getTitle());
+        if(news.isRead()) holder.setRead();
+        else holder.setUnread();
         //note: set click listener
         holder.itemView.setOnClickListener(view -> {
             Intent intent = new Intent();
             intent.setClass(context, NewsItem.class);
             intent.putExtra("news", news);
             context.startActivity(intent);
-            Thread t = new Thread(()-> {
-                news.read();
-                news.save();
-                holder.setRead();
-            });
-            t.start();
+            news.read();
+            news.save();
+            mData.set(position-1, news);
+            this.notifyItemChanged(position);
         });
     }
 
@@ -132,6 +131,10 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         public void setRead(){
             itemView.findViewById(R.id.card).setBackgroundColor(Color.argb((float) 0.47,0,0,0));
             tv.setTextColor(Color.argb((float) 0.7,0,0,0));
+        }
+        public void setUnread(){
+            itemView.findViewById(R.id.card).setBackgroundColor(Color.argb((float) 0,0,0,0));
+            tv.setTextColor(Color.argb((float) 1,0,0,0));
         }
     }
 }
