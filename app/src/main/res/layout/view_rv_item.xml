@@ -18,7 +18,7 @@
     app:cardCornerRadius="2dp"
     app:cardElevation="5dp"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/cardview_light_background"
+    app:cardBackgroundColor="#FFFFFF"
     >
         <TextView
             android:id="@+id/item_tv"
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:minHeight="50dp"
             android:gravity="start"
-            android:textSize="21sp"
+            android:textSize="18sp"
             android:textColor="#000000"
             android:typeface="sans"
             tools:text="item"/>

@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,10 +19,13 @@ import com.example.cov_news.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.provider.Settings.System.getString;
+
 class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     private Context context;
     private List<News> mData;
     private LayoutInflater mLayoutInflator;
+    private NewsListViewModel mViewModel;
     public static final int TYPE_SEARCH = 0;
     public static final int TYPE_NORMAL = 1;
     public boolean isEmpty(){
@@ -34,8 +35,9 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         mData.clear();
         notifyDataSetChanged();
     }
-    public MyAdapter(Context c){
+    public MyAdapter(Context c, NewsListViewModel mViewModel){
         this.context = c;
+        this.mViewModel = mViewModel;
         mData = new ArrayList<>();
         mLayoutInflator = LayoutInflater.from(c);
     }
@@ -69,6 +71,7 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         else holder.setUnread();
         //note: set click listener
         holder.itemView.setOnClickListener(view -> {
+            mViewModel.getNewsContent(news);
             Intent intent = new Intent();
             intent.setClass(context, NewsItem.class);
             intent.putExtra("news", news);
@@ -104,14 +107,20 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
                 @Override
                 public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    return mData.get(oldItemPosition).getId().equals(data.get(newItemPosition).getId());
+                    if(oldItemPosition==0&&newItemPosition==0)return true;
+                    if((oldItemPosition==0)^(newItemPosition==0)) return false;
+                    if(newItemPosition>data.size()||oldItemPosition>data.size()) return false;
+                    return mData.get(oldItemPosition-1).getId().equals(data.get(newItemPosition-1).getId());
                 }
 
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    News oldProduct = mData.get(oldItemPosition);
-                    if(oldProduct==null) return false;
-                    News newProduct = data.get(newItemPosition);
+                    if(oldItemPosition==0&&newItemPosition==0)return true;
+                    if((oldItemPosition==0)^(newItemPosition==0)) return false;
+                    if(newItemPosition>data.size()||oldItemPosition>data.size()) return false;
+                    News oldProduct = mData.get(oldItemPosition-1);
+                    News newProduct = data.get(newItemPosition-1);
+                    if(oldProduct==null || newProduct==null) return false;
                     if(newProduct.getLongId()==null)
                         System.out.println("oops!");
                     return newProduct.getLongId().equals(oldProduct.getLongId());
@@ -133,7 +142,7 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
             tv.setTextColor(Color.argb((float) 0.7,0,0,0));
         }
         public void setUnread(){
-            itemView.findViewById(R.id.card).setBackgroundColor(Color.argb((float) 0,0,0,0));
+            itemView.findViewById(R.id.card).setBackgroundColor(Color.rgb(255,255,255));
             tv.setTextColor(Color.argb((float) 1,0,0,0));
         }
     }

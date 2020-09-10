@@ -20,6 +20,8 @@ import static java.lang.Thread.sleep;
 
 public class NewsModel {
     final String apiAddress = "https://covid-dashboard.aminer.cn/api/events/list";
+    final String api_events = "https://covid-dashboard.aminer.cn/api/dist/events.json";
+    final String api_event  = "https://covid-dashboard.aminer.cn/api/event/";
     private ArrayList<Integer> pagination;
     final int size = 20;
     int page=1;
@@ -31,11 +33,74 @@ public class NewsModel {
         this.type = type;
         pagination = new ArrayList<>(Arrays.asList(1,0,0));
         total_lo_bound = 300000;
-        loadNewsFromDataBase();
-        page = sortedNews.size()/20;
+//        page = sortedNews.size()/20;
     }
-    private void loadNewsFromDataBase(){
-        sortedNews = News.findWithQuery(News.class, String.format("SELECT * FROM NEWS WHERE type='%s' ORDER BY date DESC", type));
+    public void loadNewsFromDataBase(){
+        sortedNews = News.findWithQuery(News.class, "SELECT * FROM NEWS ORDER BY stamp DESC");
+    }
+    private void fetchFromEvents(){
+        updating = true;
+        Thread t = new Thread(()->{
+            try {
+                URL url = new URL(api_events);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.connect();
+                if (conn.getResponseCode() == 200) {
+                    InputStream in = conn.getInputStream();
+                    List<News> input = NewsParser.readJsonStream(in, pagination);
+                    for(int i =0; i<input.size(); i++){
+                        News item = input.get(i);
+//                        News cache = SugarRecord.findById(News.class, item.getId());
+//                        if (cache != null && cache.getLongId().equals(item.getLongId())) {
+//                            input = input.subList(0, i);
+//                            break;
+//                        }
+                        item.setStamp(System.currentTimeMillis());
+                    }
+                    sortedNews = input;
+                    new Thread(()-> SugarRecord.saveInTx(input)).start();
+                }
+                updating = false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+    }
+    public void getContent(News news){
+        Thread t = new Thread(()-> {
+            News result = null;
+            try {
+                URL url = new URL(api_event + news.getLongId());
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.connect();
+                if (conn.getResponseCode() == 200) {
+                    InputStream in = conn.getInputStream();
+                    result = NewsParser.readEvent(in);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (result == null) news.setContent("没有正文内容");
+            else {
+                news.setContent(result.getContent());
+                news.setTime(result.getTime());
+                news.setSource(result.getSource());
+                news.save();
+            }
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     public void update(){
         updating = true;
@@ -85,7 +150,11 @@ public class NewsModel {
         t.start();
     }
     public List<News> getNews(int lo, int hi) {
-        if(sortedNews.size()<hi&&!updating) update();
+//        loadNewsFromDataBase();
+        if(sortedNews.size()<hi&&!updating) {
+            fetchFromEvents();
+//            update();
+        }
         while(sortedNews.size()<hi&&updating) {
             try {
                 sleep(100);
@@ -112,30 +181,31 @@ public class NewsModel {
 
     public void search(CharSequence text, MutableLiveData<List<News>> result, SearchAsyncTask searchAsyncTask) {
         searching = true;
-        int current_size = sortedNews.size();
-        if(current_size<total_lo_bound) update();
+//        int current_size = sortedNews.size();
+//        if(current_size<total_lo_bound) update();
         loadNewsFromDataBase();
         List<News> tmp = new ArrayList<>();
         int len = tmp.size();
         int cnt = 0;
-        for(int i = 0; updating||i<sortedNews.size(); i++){
+        int total = sortedNews.size();
+        for(int i = 0; i<total; i++){
             if(!searching) break;
             cnt++;
-            while(i>=sortedNews.size()){
-                try {
-                    sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+//            while(i>=sortedNews.size()){
+//                try {
+//                    sleep(10);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
             News item = sortedNews.get(i);
-            if(item.getTitle().contains(text)||item.getContent().contains(text))
+            if(item.getTitle().contains(text))
             {
                 tmp.add(item);
                 if(tmp.size()-10>len){
                     len = tmp.size();
                     result.postValue(tmp);
-                    searchAsyncTask.onProgressUpdate(cnt*100/total_lo_bound);
+                    searchAsyncTask.onProgressUpdate(cnt*100/total);
                 }
             }
         }

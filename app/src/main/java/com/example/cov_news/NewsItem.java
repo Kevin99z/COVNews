@@ -3,9 +3,7 @@ package com.example.cov_news;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.anychart.scales.DateTime;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.sina.weibo.sdk.WbSdk;
 import com.sina.weibo.sdk.api.TextObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
@@ -20,11 +18,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Date;
 
 public class NewsItem extends AppCompatActivity implements WbShareCallback {
     News news;
@@ -32,6 +32,8 @@ public class NewsItem extends AppCompatActivity implements WbShareCallback {
     private TextView mBody;
     private WbShareHandler shareHandler;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +51,8 @@ public class NewsItem extends AppCompatActivity implements WbShareCallback {
             mHeader.setText(news.getTitle());
             mBody.setText(news.getContent());
             mBody.append("\n\n 来源: " + news.getSource());
-            mBody.append("\n\n " + LocalDateTime.ofInstant(Instant.ofEpochSecond(news.getDate()), ZoneOffset.UTC).format(formatter));
+//            mBody.append("\n\n " + LocalDateTime.ofInstant(Instant.ofEpochSecond(news.getTime()), ZoneOffset.UTC).format(formatter));
+            mBody.append("\n\n " + dateFormat.format(new Date(news.getTime())));
         }
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
