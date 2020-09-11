@@ -73,7 +73,7 @@ class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
             intent.putExtra("news", news);
             context.startActivity(intent);
             news.read();
-            news.save();
+//            news.save();
             mData.set(position-1, news);
             this.notifyItemChanged(position);
         });

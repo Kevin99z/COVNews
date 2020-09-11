@@ -34,12 +34,13 @@ public class NewsModel {
         sortedNews = new ArrayList<>();
     }
     public void loadNewsFromDataBase(){
-        sortedNews = News.findWithQuery(News.class, "SELECT * FROM NEWS ORDER BY stamp DESC");
+        sortedNews = News.findWithQuery(News.class, String.format("SELECT * FROM NEWS where type='%s' ORDER BY stamp DESC ",type));
     }
     public void fetchFromEvents(){
         updating = true;
         Thread t = new Thread(()->{
             try {
+                loadNewsFromDataBase();
                 URL url = new URL(api_events);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
@@ -47,23 +48,25 @@ public class NewsModel {
                 conn.setReadTimeout(10000);
                 conn.connect();
                 if (conn.getResponseCode() == 200) {
+                    List<News> tmp = new ArrayList<>();
                     InputStream in = conn.getInputStream();
                     List<News> input = NewsParser.readJsonStream(in, pagination);
                     for(int i =0; i<input.size(); i++){
                         News item = input.get(i);
+                        for(News cache: sortedNews){
+                            if(cache.getLongId().equals(item.getLongId())) item=cache;
+                        }
 //                        News cache = SugarRecord.findById(News.class, item.getId());
-//                        if (cache != null && cache.getLongId().equals(item.getLongId())) {
-//                            input = input.subList(0, i);
-//                            break;
-//                        }
-                        item.setStamp(System.currentTimeMillis());
+//                        item.setStamp(System.currentTimeMillis());
+                        if(item.type.equals(type)) tmp.add(item);
                     }
-                    sortedNews = input;
-                    new Thread(()-> SugarRecord.saveInTx(input)).start();
+                    sortedNews = tmp;
+//                    SugarRecord.saveInTx(input);
                 }
                 updating = false;
             } catch (IOException e) {
                 e.printStackTrace();
+                updating = false;
             }
         });
         t.start();
@@ -90,6 +93,7 @@ public class NewsModel {
                 news.setContent(result.getContent());
                 news.setTime(result.getTime());
                 news.setSource(result.getSource());
+                news.read();
                 news.save();
             }
         });
@@ -151,7 +155,7 @@ public class NewsModel {
         if(sortedNews.size()<hi&&!updating) {
             fetchFromEvents();
         }
-        while(sortedNews.size()<hi&&updating) {
+        while(updating) {
             try {
                 sleep(100);
             } catch (InterruptedException e) {
@@ -177,7 +181,7 @@ public class NewsModel {
 
     public void search(CharSequence text, MutableLiveData<List<News>> result, SearchAsyncTask searchAsyncTask) {
         searching = true;
-        loadNewsFromDataBase();
+//        loadNewsFromDataBase();
         List<News> tmp = new ArrayList<>();
         int len = tmp.size();
         int cnt = 0;

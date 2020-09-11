@@ -20,7 +20,7 @@ import java.util.List;
 public class NewsParser{
     @SuppressLint("SimpleDateFormat")
     private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME;
-    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
     public static List<News> readJsonStream(InputStream in, List<Integer> pagination) throws IOException {
         JsonReader reader = new JsonReader(new InputStreamReader(in));
         reader.beginObject();
@@ -69,6 +69,9 @@ public class NewsParser{
                     news._id = reader.nextString();
                     news.setId(Long.parseUnsignedLong(news._id.substring(8), 16));
                     break;
+                case "type":
+                    news.type = reader.nextString();
+                    break;
                 case "entities":
                     reader.beginArray();
                     while(reader.hasNext()){
@@ -114,13 +117,15 @@ public class NewsParser{
 //                    Log.i("NewsParser", String.valueOf("Authors list size: " + news.authors.size()));
                     break;
                 case "date":
-                    try {
-                        LocalDateTime date= LocalDateTime.from(dateTimeFormatter.parse(reader.nextString()));
-                        news.stamp = date.toEpochSecond(ZoneOffset.UTC);
-                    } catch (DateTimeParseException e) {
-                        e.printStackTrace();
-                    }
+                    reader.skipValue();
                     break;
+//                    try {
+//                        LocalDateTime date= LocalDateTime.from(dateTimeFormatter.parse(reader.nextString()));
+//                        news.stamp = date.toEpochSecond(ZoneOffset.UTC);
+//                    } catch (DateTimeParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                    break;
                 case "time":
                     if(!readTime) {
                         reader.skipValue();

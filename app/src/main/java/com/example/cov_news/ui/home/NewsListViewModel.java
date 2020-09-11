@@ -69,7 +69,6 @@ public class NewsListViewModel extends ViewModel {
     public void initNews(){
         dataModel.fetchFromEvents();
         Thread t = new Thread(()-> {
-            dataModel.loadNewsFromDataBase();
             newsList.postValue(dataModel.getNews(0, page*size));
         });
         t.start();

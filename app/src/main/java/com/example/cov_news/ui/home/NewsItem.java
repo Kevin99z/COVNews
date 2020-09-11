@@ -22,6 +22,9 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -50,7 +53,7 @@ public class NewsItem extends AppCompatActivity implements WbShareCallback {
             mHeader.setText(news.getTitle());
             mBody.setText(news.getContent());
             mBody.append("\n\n 来源: " + news.getSource());
-//            mBody.append("\n\n " + LocalDateTime.ofInstant(Instant.ofEpochSecond(news.getTime()), ZoneOffset.UTC).format(formatter));
+//            mBody.append("\n\n " + LocalDateTime.ofInstant(Instant.ofEpochSecond(news.getStamp()), ZoneOffset.UTC).format(formatter));
             mBody.append("\n\n " + dateFormat.format(new Date(news.getTime())));
         }
         FloatingActionButton fab = findViewById(R.id.fab);
