@@ -27,18 +27,14 @@ import android.widget.Toast;
 
 import com.example.cov_news.R;
 
-import static java.lang.Thread.sleep;
 
 public class NewsList extends Fragment {
     private NewsListViewModel mViewModel;
-    private RecyclerView list;
+    private RecyclerView listView;
     private LinearLayoutManager mLayoutManager;
     private EditText editText;
     private Button button;
     private ProgressBar mProgressBar;
-//    private int mScrollY;
-//    private boolean showSearchBar = true;
-//    private int searchHeight;
     NewsAdapter adapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String type;
@@ -53,9 +49,7 @@ public class NewsList extends Fragment {
         firstTime = true;
         searching = false;
     }
-//    public static NewsList newInstance() {
-//        return new NewsList();
-//    }
+
     public void hideKeyboard(View view) {
     InputMethodManager manager = (InputMethodManager) view.getContext()
             .getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -67,28 +61,24 @@ public class NewsList extends Fragment {
         View root = inflater.inflate(R.layout.news_list_fragment, container, false);
         mLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
         mProgressBar = root.findViewById(R.id.progress_bar);
-        list = root.findViewById(R.id.list);
-        list.setLayoutManager(mLayoutManager);
+        listView = root.findViewById(R.id.list);
+        listView.setLayoutManager(mLayoutManager);
         mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
-                    // This method performs the actual data-refresh operation.
-                    // The method calls setRefreshing(false) when it's finished.
             if(loading) {
                 Toast.makeText(getActivity(), "已经在加载中", Toast.LENGTH_LONG).show();
             }
-//                    adapter.clear();
             else if(searching) {
                 button.performClick();
             }
             else mViewModel.initNews();
         }
         );
-        list.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        listView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             public void onScrollStateChanged(@NonNull RecyclerView view, int scrollState){
                 super.onScrollStateChanged(view, scrollState);
                 if(mLayoutManager.findLastVisibleItemPosition()==adapter.getItemCount()-1&&!searching&&!loading){
                     mViewModel.fetchNews(adapter.getItemCount());
-//                    mViewModel.getMoreNews(loading);
                 }
                 if(editText !=null && editText.hasFocus()){//todo:check if bug
                     hideKeyboard(editText);
@@ -105,33 +95,10 @@ public class NewsList extends Fragment {
         mViewModel = ViewModelProviders.of(this.getParentFragment().getActivity()).get(type, NewsListViewModel.class);
         mViewModel.init(type);
         adapter = new NewsAdapter(getContext(), mViewModel);
-        list.setAdapter(adapter);
+        listView.setAdapter(adapter);
         //note: bind adapter and data
         mViewModel.getNewsList().observe(getViewLifecycleOwner(), data -> {
-//            if(editText==null){
-//                View first = list.getChildAt(0);
-//                if(first!=null) editText=first.findViewById(R.id.search_bar);
-//            }
-//            if(editText!=null && !editInit){
-//                editInit=true;
-////                editText.setOnClickListener(view -> {
-////
-////                });
-//                editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                    @Override
-//                    public boolean onEditorAction(TextView v, int actionId, KeyEvent keyEvent) {
-//                        if (actionId == EditorInfo.IME_ACTION_SEARCH||keyEvent!=null&&keyEvent.getKeyCode()==KeyEvent.KEYCODE_ENTER) {
-//                            NewsList.this.hideKeyboard(v);
-//                            adapter.clear();
-//                            mViewModel.search(v.getText(), mProgressBar);
-//                            return true;
-//                        }
-//                        return false;
-//                    }
-//                });
-//            }
             if(data!=null){
-//                adapter.addAll(data);
                 adapter.setData(data);
             }
             if(mSwipeRefreshLayout.isRefreshing()){
@@ -148,7 +115,7 @@ public class NewsList extends Fragment {
 
     }
     public void initAfterViewCreated() {
-        View v = list.getChildAt(0);
+        View v = listView.getChildAt(0);
         editText = v.findViewById(R.id.TEXT);
         editText.setHint(String.format("在%s中搜索", type));
         button = v.findViewById(R.id.button);
@@ -186,6 +153,6 @@ public class NewsList extends Fragment {
         });
     }
     public void scrollToTop(){
-        list.getLayoutManager().smoothScrollToPosition(list, new RecyclerView.State(), 0);
+        listView.getLayoutManager().smoothScrollToPosition(listView, new RecyclerView.State(), 0);
     }
 }

@@ -24,10 +24,6 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.*;
 
 public class HomeFragment extends Fragment {
-    private ListView listView;
-    ArrayAdapter<News> adapter; // todo: write a custom adapter
-    private HomeViewModel homeViewModel;
-    SwipeRefreshLayout mSwipeRefreshLayout;
     TabLayout visible_tabs;
     TabLayout hidden_tabs;
     TextView text_hint;
@@ -56,13 +52,11 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
         visible_tabs = (TabLayout) root.findViewById(R.id.mytab);
         mViewPager = (ViewPager) root.findViewById(R.id.mViewPager);
         addButton = root.findViewById(R.id.add_button);
         hidden_tabs = root.findViewById(R.id.tabs_to_add);
         text_hint = root.findViewById(R.id.text_hint);
-//        visible_tabs.addTab(visible_tabs.newTab().setText("选项卡一"));
         mTitle = new ArrayList<>();
         mTitle.add("news");
         mTitle.add("paper");
@@ -95,16 +89,14 @@ public class HomeFragment extends Fragment {
         };
 
         addButton.setOnClickListener(view -> {
-            if(hidden_tabs.getVisibility()==View.INVISIBLE) {
+            if(hidden_tabs.getVisibility()==View.GONE) {
                 hidden_tabs.setVisibility(View.VISIBLE);
-                visible_tabs.setVisibility(View.VISIBLE);
-//                hidden_tabs.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                text_hint.setVisibility(View.VISIBLE);
                 Toast.makeText(getActivity(), "点击标签以移动分组", Toast.LENGTH_LONG).show();
             }
             else {
-//                hidden_tabs.setLayoutParams(new LinearLayout.LayoutParams(0,0));
                 hidden_tabs.setVisibility(View.GONE);
-                visible_tabs.setVisibility(View.GONE);
+                text_hint.setVisibility(View.GONE);
             }
         });
         visible_tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
@@ -155,7 +147,6 @@ public class HomeFragment extends Fragment {
             }
         });
         //note: use getActivity() to keep homeViewModel the same throughout main activity
-//        final TextView textView = root.findViewById(R.id.text_home);
         mViewPager.setAdapter(adapter);
         visible_tabs.setupWithViewPager(mViewPager);
         return root;

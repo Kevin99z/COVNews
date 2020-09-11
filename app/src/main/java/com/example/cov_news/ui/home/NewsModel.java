@@ -32,12 +32,11 @@ public class NewsModel {
         pagination = new ArrayList<>(Arrays.asList(1,0,0));
         total_lo_bound = 300000;
         sortedNews = new ArrayList<>();
-//        page = sortedNews.size()/20;
     }
     public void loadNewsFromDataBase(){
         sortedNews = News.findWithQuery(News.class, "SELECT * FROM NEWS ORDER BY stamp DESC");
     }
-    private void fetchFromEvents(){
+    public void fetchFromEvents(){
         updating = true;
         Thread t = new Thread(()->{
             try {
@@ -149,10 +148,8 @@ public class NewsModel {
         t.start();
     }
     public List<News> getNews(int lo, int hi) {
-//        loadNewsFromDataBase();
         if(sortedNews.size()<hi&&!updating) {
             fetchFromEvents();
-//            update();
         }
         while(sortedNews.size()<hi&&updating) {
             try {
@@ -180,8 +177,6 @@ public class NewsModel {
 
     public void search(CharSequence text, MutableLiveData<List<News>> result, SearchAsyncTask searchAsyncTask) {
         searching = true;
-//        int current_size = sortedNews.size();
-//        if(current_size<total_lo_bound) update();
         loadNewsFromDataBase();
         List<News> tmp = new ArrayList<>();
         int len = tmp.size();
@@ -190,13 +185,6 @@ public class NewsModel {
         for(int i = 0; i<total; i++){
             if(!searching) break;
             cnt++;
-//            while(i>=sortedNews.size()){
-//                try {
-//                    sleep(10);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
             News item = sortedNews.get(i);
             if(item.getTitle().contains(text))
             {

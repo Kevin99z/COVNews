@@ -66,7 +66,8 @@ public class NewsListViewModel extends ViewModel {
 //        SugarRecord.findById(News.class, id).read();
 //    }
 
-    public void initNews(){//todo:consider do update
+    public void initNews(){
+        dataModel.fetchFromEvents();
         Thread t = new Thread(()-> {
             dataModel.loadNewsFromDataBase();
             newsList.postValue(dataModel.getNews(0, page*size));
