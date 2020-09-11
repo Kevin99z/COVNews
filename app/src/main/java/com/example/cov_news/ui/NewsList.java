@@ -39,7 +39,7 @@ public class NewsList extends Fragment {
 //    private int mScrollY;
 //    private boolean showSearchBar = true;
 //    private int searchHeight;
-    MyAdapter adapter;
+    NewsAdapter adapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
     String type;
     Boolean loading;
@@ -104,7 +104,7 @@ public class NewsList extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this.getParentFragment().getActivity()).get(type, NewsListViewModel.class);
         mViewModel.init(type);
-        adapter = new MyAdapter(getContext(), mViewModel);
+        adapter = new NewsAdapter(getContext(), mViewModel);
         list.setAdapter(adapter);
         //note: bind adapter and data
         mViewModel.getNewsList().observe(getViewLifecycleOwner(), data -> {

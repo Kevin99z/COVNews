@@ -19,9 +19,7 @@ import com.example.cov_news.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.provider.Settings.System.getString;
-
-class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
+class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     private Context context;
     private List<News> mData;
     private LayoutInflater mLayoutInflator;
@@ -35,7 +33,7 @@ class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         mData.clear();
         notifyDataSetChanged();
     }
-    public MyAdapter(Context c, NewsListViewModel mViewModel){
+    public NewsAdapter(Context c, NewsListViewModel mViewModel){
         this.context = c;
         this.mViewModel = mViewModel;
         mData = new ArrayList<>();

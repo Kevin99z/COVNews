@@ -33,6 +33,7 @@ public class NewsModel {
         this.type = type;
         pagination = new ArrayList<>(Arrays.asList(1,0,0));
         total_lo_bound = 300000;
+        sortedNews = new ArrayList<>();
 //        page = sortedNews.size()/20;
     }
     public void loadNewsFromDataBase(){

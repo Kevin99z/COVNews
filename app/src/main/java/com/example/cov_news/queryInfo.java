@@ -165,11 +165,16 @@ public class queryInfo extends AppCompatActivity {
                                 reader.endObject();
                                 break;
                             case "img":
-                                String url = reader.nextString();
-                                if(url != null){
-                                    InputStream URLcontent = (InputStream) new URL(url).getContent();
-                                    Drawable image = Drawable.createFromStream(URLcontent, "your source link");
-                                    imageView.setImageDrawable(image);
+                                try {
+                                    String url = reader.nextString();
+                                    if (url != null) {
+                                        InputStream URLcontent = (InputStream) new URL(url).getContent();
+                                        Drawable image = Drawable.createFromStream(URLcontent, "your source link");
+                                        imageView.setImageDrawable(image);
+                                    }
+                                }
+                                catch(IllegalStateException e){
+                                    reader.skipValue();
                                 }
                                 break;
                             default:
