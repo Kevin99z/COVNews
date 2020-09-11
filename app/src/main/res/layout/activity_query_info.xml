@@ -23,7 +23,7 @@
             android:orientation="vertical"
             >
 
-            <com.example.cov_news.NoScrollListView
+            <com.zhangzeyuan.cov_news.NoScrollListView
                 android:id="@+id/prop_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -56,7 +56,7 @@
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.example.cov_news.NoScrollListView
+            <com.zhangzeyuan.cov_news.NoScrollListView
                 android:id="@+id/list_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
