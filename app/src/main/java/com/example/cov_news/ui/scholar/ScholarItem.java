@@ -8,15 +8,12 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.cov_news.News;
 import com.example.cov_news.R;
 
 import java.io.InputStream;
-import java.util.Date;
 
 public class ScholarItem extends AppCompatActivity {
     Scholar scholar;
@@ -58,12 +55,12 @@ public class ScholarItem extends AppCompatActivity {
         imageView = this.findViewById(R.id.figure);
         if (scholar != null) {
             mHeader.setText(scholar.name_zh);
-            mBody.setText(Html.fromHtml(String.format("<table><tbody>" +
-                    "<small><tr><th>个人主页</th> <td> <small>%s</small></td></tr></small>" +
-                    "<>"+
-                    "</tbody></table>" +
+            mBody.setText(Html.fromHtml(String.format(
+                    "<p><small>个人主页 : <small>%s</small></small></p>" +
+                    "<p><small>职位: %s</small> </p>"+
+                    "<p><small>所属机构: %s</small></p>"+
                     "<p>%s</p>" +
-                    "<p>%s</p>",scholar.homepage, scholar.bio, scholar.note)));
+                    "<p>%s</p>",scholar.homepage, scholar.position, scholar.affiliation,scholar.bio, scholar.note)));
         }
         new DownloadImageTask(imageView).execute(scholar.img_url);
     }

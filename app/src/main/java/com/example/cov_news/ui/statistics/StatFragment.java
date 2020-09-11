@@ -1,4 +1,4 @@
-package com.example.cov_news.ui.dashboard;
+package com.example.cov_news.ui.statistics;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,7 +20,6 @@ import com.anychart.data.Set;
 import com.anychart.enums.ScaleStackMode;
 import com.bin.david.form.core.SmartTable;
 import com.bin.david.form.core.TableConfig;
-import com.example.cov_news.ProvInfo;
 import com.example.cov_news.R;
 
 import java.text.DateFormat;
@@ -28,16 +27,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DashboardFragment extends Fragment {
+public class StatFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private StatViewModel statViewModel;
     private AnyChartView chartView;
     private SmartTable<ProvInfo> table;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel = ViewModelProviders.of(getActivity()).get(DashboardViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        statViewModel = ViewModelProviders.of(getActivity()).get(StatViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_stat, container, false);
         TextView tv = root.findViewById(R.id.title1);
+        //世界疫情
         tv.setText("世界疫情："+SimpleDateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(new Date(System.currentTimeMillis())));
 //        final TextView textView = root.findViewById(R.id.text_dashboard);
 //        final SmartTable table = root.findViewById(R.id.table);
@@ -45,20 +45,25 @@ public class DashboardFragment extends Fragment {
         APIlib.getInstance().setActiveAnyChartView(chartView);
         Cartesian chart = AnyChart.column();
         chart.yScale().stackMode(ScaleStackMode.VALUE);
+        chart.yAxis(0).labels().format("{%Value}{scale:(10000)(1)|(万)}");
+        chart.title("全球确诊人数");
 //        chart.yScale().ticks().interval(200000);
         Set set = Set.instantiate();
         chart.column(set.mapAs("{ x: 'x', value: 'recovered' }")).tooltip().format("痊愈: {%value}");
-        chart.column(set.mapAs("{ x: 'x', value: 'death' }")).tooltip().format("死亡: {%value}");
+        chart.column(set.mapAs("{ x: 'x', value: 'deaths' }")).tooltip().format("死亡: {%value}");
         chart.column(set.mapAs("{ x: 'x', value: 'active' }")).tooltip().format("现存: {%value}");
+        chart.legend();
         chartView.setChart(chart);
+        // 国内疫情
         table = root.findViewById(R.id.table);
         TableConfig config = table.getConfig();
+        config.setShowTableTitle(false);
         config.setShowXSequence(false);
         config.setShowYSequence(false);
-        dashboardViewModel.getProvInfo().observe(getViewLifecycleOwner(), data->{
+        statViewModel.getProvInfo().observe(getViewLifecycleOwner(), data->{
             table.setData(data);
         });
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        statViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 if(!s.equals("")) {
@@ -74,14 +79,14 @@ public class DashboardFragment extends Fragment {
                 }
             }
         });
-        dashboardViewModel.getSeriesData().observe(getViewLifecycleOwner(), seriesData -> {
+        statViewModel.getSeriesData().observe(getViewLifecycleOwner(), seriesData -> {
 //                        chart.animation(true);
             APIlib.getInstance().setActiveAnyChartView(chartView);
             set.data(seriesData);
         });
 
-        dashboardViewModel.fetchGlobalData();
-        dashboardViewModel.fetchChinaData();
+        statViewModel.fetchGlobalData();
+        statViewModel.fetchChinaData();
         return root;
     }
 }

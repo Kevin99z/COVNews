@@ -13,9 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.scholar.ScholarItem"></activity>
-        <activity android:name=".queryInfo" />
+        <activity android:name=".ui.graph.queryInfo" />
         <activity
-            android:name=".NewsItem"
+            android:name=".ui.home.NewsItem"
             android:label="@string/title_activity_news_item"
             android:theme="@style/AppTheme.NoActionBar" /> <!-- for sugarORM -->
         <meta-data

@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.cov_news.R;
-import com.example.cov_news.queryInfo;
 
 import java.io.IOException;
 import java.io.InputStream;

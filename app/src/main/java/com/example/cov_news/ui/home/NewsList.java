@@ -1,4 +1,4 @@
-package com.example.cov_news.ui;
+package com.example.cov_news.ui.home;
 
 import androidx.lifecycle.ViewModelProviders;
 
@@ -66,10 +66,10 @@ public class NewsList extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.news_list_fragment, container, false);
         mLayoutManager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
-        mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
         mProgressBar = root.findViewById(R.id.progress_bar);
         list = root.findViewById(R.id.list);
         list.setLayoutManager(mLayoutManager);
+        mSwipeRefreshLayout = root.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
                     // This method performs the actual data-refresh operation.
                     // The method calls setRefreshing(false) when it's finished.
@@ -150,6 +150,7 @@ public class NewsList extends Fragment {
     public void initAfterViewCreated() {
         View v = list.getChildAt(0);
         editText = v.findViewById(R.id.TEXT);
+        editText.setHint(String.format("在%s中搜索", type));
         button = v.findViewById(R.id.button);
         //note: init button click listener
         button.setOnClickListener(view -> {
@@ -158,6 +159,12 @@ public class NewsList extends Fragment {
             mViewModel.initNews();
             button.setVisibility(View.INVISIBLE);
             button.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT));
+        });
+        editText.setOnClickListener(new EditText.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                scrollToTop();
+            }
         });
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

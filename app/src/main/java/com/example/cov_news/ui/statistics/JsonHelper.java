@@ -1,4 +1,4 @@
-package com.example.cov_news;
+package com.example.cov_news.ui.statistics;
 
 import android.text.TextUtils;
 import android.util.Log;

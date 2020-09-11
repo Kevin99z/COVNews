@@ -1,12 +1,10 @@
-package com.example.cov_news.ui;
+package com.example.cov_news.ui.home;
 
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import androidx.lifecycle.MutableLiveData;
-
-import com.example.cov_news.News;
 
 import java.util.List;
 
@@ -35,7 +33,7 @@ class SearchAsyncTask extends AsyncTask<String, Integer, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        progressBar.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

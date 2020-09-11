@@ -1,4 +1,4 @@
-package com.example.cov_news;
+package com.example.cov_news.ui.home;
 
 import android.annotation.SuppressLint;
 import android.util.JsonReader;

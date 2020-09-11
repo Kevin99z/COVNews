@@ -1,4 +1,4 @@
-package com.example.cov_news.ui;
+package com.example.cov_news.ui.home;
 
 import android.os.AsyncTask;
 

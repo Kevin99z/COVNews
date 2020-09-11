@@ -37,7 +37,7 @@
                 android:id="@+id/figure"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:scaleType="centerInside"
+                android:scaleType="centerCrop"
                 android:adjustViewBounds="true"
                 android:layout_margin="50dp"
                 android:contentDescription="figure" />

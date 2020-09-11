@@ -1,11 +1,9 @@
-package com.example.cov_news.ui;
+package com.example.cov_news.ui.home;
 
 import android.widget.ProgressBar;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import com.example.cov_news.News;
 
 import java.util.ArrayList;
 import java.util.Arrays;

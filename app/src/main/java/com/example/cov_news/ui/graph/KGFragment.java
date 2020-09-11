@@ -1,13 +1,11 @@
-package com.example.cov_news.ui.notifications;
+package com.example.cov_news.ui.graph;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.method.ScrollingMovementMethod;
 import android.util.JsonReader;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,22 +16,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cov_news.R;
-import com.example.cov_news.queryInfo;
-import com.example.cov_news.ui.NewsList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,9 +33,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class NotificationsFragment extends Fragment {
+public class KGFragment extends Fragment {
 
-    private NotificationsViewModel notificationsViewModel;
+    private KGViewModel KGViewModel;
     private EditText editText;
     private Button button;
     private ProgressBar mProgressBar;
@@ -53,9 +44,9 @@ public class NotificationsFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                ViewModelProviders.of(this).get(NotificationsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_notifications, container, false);
+        KGViewModel =
+                ViewModelProviders.of(this).get(KGViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_graph, container, false);
         ListView listView = root.findViewById(R.id.list_view);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(root.getContext(), android.R.layout.simple_list_item_1, queryList);
         listView.setAdapter(arrayAdapter);
@@ -82,7 +73,7 @@ public class NotificationsFragment extends Fragment {
                 return false;
             }
         });
-
+        editText.setHint("键入以搜索");
         return root;
     }
 

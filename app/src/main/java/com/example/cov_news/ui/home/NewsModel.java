@@ -1,11 +1,9 @@
-package com.example.cov_news.ui;
+package com.example.cov_news.ui.home;
 
 import android.annotation.SuppressLint;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.cov_news.News;
-import com.example.cov_news.NewsParser;
 import com.orm.SugarRecord;
 
 import java.io.IOException;

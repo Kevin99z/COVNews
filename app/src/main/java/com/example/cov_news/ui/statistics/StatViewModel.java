@@ -1,4 +1,4 @@
-package com.example.cov_news.ui.dashboard;
+package com.example.cov_news.ui.statistics;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -8,17 +8,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.*;
 
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.data.Set;
-import com.example.cov_news.DailyRecord;
-import com.example.cov_news.JsonHelper;
-import com.example.cov_news.ProvInfo;
 import com.orm.SugarRecord;
 
 import org.jsoup.Jsoup;
@@ -26,7 +21,7 @@ import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
 
 
-public class DashboardViewModel extends ViewModel {
+public class StatViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
     private MutableLiveData<List<ProvInfo>> provInfo;
@@ -39,7 +34,7 @@ public class DashboardViewModel extends ViewModel {
     private MutableLiveData<List<DataEntry>> seriesData;
     final String global_url= "https://covid2019-api.herokuapp.com/v2/current";
     final String china_url = "https://zh.wikipedia.org/wiki/2019冠状病毒病中国大陆疫情";
-    public DashboardViewModel() {
+    public StatViewModel() {
         mText = new MutableLiveData<>();
         seriesData = new MutableLiveData<>();
         provInfo = new MutableLiveData<>();

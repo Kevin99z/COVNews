@@ -1,4 +1,4 @@
-package com.example.cov_news;
+package com.example.cov_news.ui.home;
 
 import com.orm.SugarRecord;
 
@@ -67,7 +67,7 @@ public class News extends SugarRecord implements Serializable {
     public String toString() {
         return title;
     }
-    // com.example.cov_news.News contains:
+    // com.example.cov_news.ui.home.News contains:
     // "_id", "authors"(list),
     // "content", "date"
     // "entities": [ 

@@ -1,14 +1,14 @@
-package com.example.cov_news.ui.notifications;
+package com.example.cov_news.ui.graph;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class NotificationsViewModel extends ViewModel {
+public class KGViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public NotificationsViewModel() {
+    public KGViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("");
     }

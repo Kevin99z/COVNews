@@ -1,74 +1,98 @@
-package com.example.cov_news;
+package com.example.cov_news.ui.graph;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.JsonReader;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toolbar;
+
+import com.example.cov_news.NoScrollListView;
+import com.example.cov_news.R;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
+
 
 public class queryInfo extends AppCompatActivity {
 
-    private TextView textViewQuery;
-    private ListView listViewQuery;
+    private TextView textViewQuery, title;
+    private NoScrollListView relation_list, prop_list;
     private String query;
     private ImageView imageView;
+    private TextView loadMore;
+    private MoreAdapter moreAdapter;
+    private ArrayAdapter<String> stringAdapter;
+    private ArrayList<String> props;
     ArrayList<String> queryList = new ArrayList<String>();
+    private boolean isShowMore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_query_info);
         textViewQuery = this.findViewById(R.id.text_view_id);
+        imageView = this.findViewById(R.id.img_view);
+        prop_list = this.findViewById(R.id.prop_list);
+        relation_list = this.findViewById(R.id.list_view);
         this.textViewQuery.setTextColor(Color.BLACK);
         textViewQuery.setMovementMethod(new ScrollingMovementMethod());
-
-        imageView = this.findViewById(R.id.img_view);
-
-        listViewQuery = this.findViewById(R.id.list_view);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, queryList);
-        listViewQuery.setAdapter(arrayAdapter);
+//        list.setAdapter(arrayAdapter);
+        moreAdapter = new MoreAdapter();
+        relation_list.setAdapter(moreAdapter);
+        loadMore = findViewById(R.id.loadMore);
+        loadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isShowMore) {
+                    loadMore.setText("点击显示更多");
+                } else {
+                    loadMore.setText("点击收起");
+                }
+                isShowMore = !isShowMore;
+                moreAdapter.notifyDataSetChanged();
+            }
+        });
+        loadMore.setText("点击显示更多");
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null){
+        if (bundle != null) {
             query = bundle.getString("Query");
-            textViewQuery.setText(query + ":\n");
+            props=new ArrayList<>();
             querySearch();
+            stringAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, props);
+            prop_list.setAdapter(stringAdapter);
+            title = this.findViewById(R.id.title);
+            title.setText(query);
+//            arrayAdapter.notifyDataSetChanged();
+//            listViewQuery.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
-        listViewQuery.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        relation_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
-                Intent intent = new Intent(listViewQuery.getContext(), queryInfo.class);
-                String arr[] = listViewQuery.getItemAtPosition(i).toString().split(" ");
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(relation_list.getContext(), queryInfo.class);
+                String arr[] = relation_list.getItemAtPosition(i).toString().split(" ");
                 intent.putExtra("Query", arr[1]);
                 startActivity(intent);
             }
         });
     }
+
 
     private void querySearch(){
         Thread t = new Thread(() -> {
@@ -101,42 +125,61 @@ public class queryInfo extends AppCompatActivity {
     public void parse(InputStream in) throws IOException { //找到词语信息后读取
         JsonReader reader = new JsonReader(new InputStreamReader(in));
         reader.beginObject();
+        boolean finished=false;
+        String tmp;
         while(reader.hasNext()){
-            String name = reader.nextName();
-            if(name.equals("data")){
+            if(reader.nextName().equals("data")){
                 reader.beginArray();
                 while(reader.hasNext()){
+                    if(finished) reader.skipValue();
                     reader.beginObject();
+                    boolean valid = true;
                     while(reader.hasNext()){
-                        String name2 = reader.nextName();
-                        switch(name2){
+                        if(!valid) {
+                            reader.nextName();
+                            reader.skipValue();
+                        }
+                        else switch(reader.nextName()){
+                            case "label":
+                                if(query.equals(reader.nextString())) finished=true;
+                                else valid = false;
+                                break;
                             case "abstractInfo":
                                 reader.beginObject();
                                 while(reader.hasNext()){
-                                    String name3 = reader.nextName();
-                                    switch(name3){
+                                    switch(reader.nextName()){
                                         case "enwiki":
-                                            textViewQuery.append(reader.nextString());
+                                            tmp = reader.nextString();
+                                            if(tmp.length()>1)
+                                            textViewQuery.append("维基百科:\n"+tmp);
                                             break;
                                         case "baidu":
-                                            textViewQuery.append(reader.nextString());
+                                            tmp = reader.nextString();
+                                            if(tmp.length()>1)
+                                            textViewQuery.append("百度百科:\n"+tmp);
                                             break;
                                         case "zhwiki":
-                                            textViewQuery.append(reader.nextString());
+                                            tmp = reader.nextString();
+                                            if(tmp.length()>1)
+                                                textViewQuery.append("知乎百科:\n"+tmp);
                                             break;
                                         case "COVID":
                                             reader.beginObject();
                                             while(reader.hasNext()){
-                                                String name4 = reader.nextName();
-                                                switch(name4){
+                                                switch(reader.nextName()){
+                                                    case "properties":
+                                                        reader.beginObject();
+                                                        while(reader.hasNext())
+                                                            props.add(String.format("%s: %s",reader.nextName(), reader.nextString()));
+                                                        reader.endObject();
+                                                        break;
                                                     case "relations":
                                                         reader.beginArray();
                                                         while(reader.hasNext()){
                                                             String listItem = "";
                                                             reader.beginObject();
                                                             while(reader.hasNext()) {
-                                                                String name5 = reader.nextName();
-                                                                switch (name5) {
+                                                                switch (reader.nextName()) {
                                                                     case "relation":
                                                                         listItem = reader.nextString() + ": ";
                                                                         break;
@@ -191,5 +234,38 @@ public class queryInfo extends AppCompatActivity {
         reader.endObject();
     }
 
+    private class MoreAdapter extends BaseAdapter {
 
+        public MoreAdapter(){
+
+        }
+        @Override
+        public int getCount() {
+            // 重点区域
+            if (isShowMore) {
+                return queryList.size();
+            } else {
+                return Math.min(queryList.size(), 3);
+            }
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return queryList.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            View itemView = View.inflate(getApplicationContext(), R.layout.list_view_item, null);
+            TextView name = itemView.findViewById(R.id.name);
+            name.setText(queryList.get(i));
+            return itemView;
+
+        }
+    }
 }

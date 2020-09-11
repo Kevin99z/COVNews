@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,9 +18,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.cov_news.News;
 import com.example.cov_news.R;
-import com.example.cov_news.ui.NewsList;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.*;
@@ -30,6 +30,7 @@ public class HomeFragment extends Fragment {
     SwipeRefreshLayout mSwipeRefreshLayout;
     TabLayout visible_tabs;
     TabLayout hidden_tabs;
+    TextView text_hint;
     ViewPager mViewPager;
     List<String> mTitle;
     List<NewsList> mFragment;
@@ -60,6 +61,7 @@ public class HomeFragment extends Fragment {
         mViewPager = (ViewPager) root.findViewById(R.id.mViewPager);
         addButton = root.findViewById(R.id.add_button);
         hidden_tabs = root.findViewById(R.id.tabs_to_add);
+        text_hint = root.findViewById(R.id.text_hint);
 //        visible_tabs.addTab(visible_tabs.newTab().setText("选项卡一"));
         mTitle = new ArrayList<>();
         mTitle.add("news");
@@ -95,12 +97,14 @@ public class HomeFragment extends Fragment {
         addButton.setOnClickListener(view -> {
             if(hidden_tabs.getVisibility()==View.INVISIBLE) {
                 hidden_tabs.setVisibility(View.VISIBLE);
-                hidden_tabs.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//                addButton.setImage("x");
+                visible_tabs.setVisibility(View.VISIBLE);
+//                hidden_tabs.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                Toast.makeText(getActivity(), "点击标签以移动分组", Toast.LENGTH_LONG).show();
             }
             else {
-                hidden_tabs.setLayoutParams(new LinearLayout.LayoutParams(0,0));
-                hidden_tabs.setVisibility(View.INVISIBLE);
+//                hidden_tabs.setLayoutParams(new LinearLayout.LayoutParams(0,0));
+                hidden_tabs.setVisibility(View.GONE);
+                visible_tabs.setVisibility(View.GONE);
             }
         });
         visible_tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){

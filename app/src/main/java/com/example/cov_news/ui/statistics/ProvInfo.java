@@ -1,4 +1,4 @@
-package com.example.cov_news;
+package com.example.cov_news.ui.statistics;
 
 import com.bin.david.form.annotation.SmartColumn;
 import com.bin.david.form.annotation.SmartTable;

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.dashboard.DashboardFragment">
+    tools:context=".ui.statistics.StatFragment">
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -19,6 +19,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="世界疫情"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/stat_title"
                     >
                 </TextView>
                 <HorizontalScrollView
@@ -39,6 +41,15 @@
                         </LinearLayout>
 
                 </HorizontalScrollView>
+                        <TextView
+                            android:id="@+id/title2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="国内疫情"
+                            android:textAlignment="center"
+                            android:textSize="@dimen/stat_title"
+                            >
+                        </TextView>
                 <com.bin.david.form.core.SmartTable
                         android:layout_height="1000dp"
                         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.example.cov_news.ui;
+package com.example.cov_news.ui.home;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,8 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.cov_news.News;
-import com.example.cov_news.NewsItem;
 import com.example.cov_news.R;
 
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
                 return new ViewHolder(mLayoutInflator.inflate(R.layout.search_bar, parent, false));
             }
             else{
-                return new ViewHolder(mLayoutInflator.inflate(R.layout.view_rv_item, parent, false));
+                return new ViewHolder(mLayoutInflator.inflate(R.layout.news_card, parent, false));
             }
     }
     @Override
@@ -88,45 +86,46 @@ class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     }
 
     public void setData(List<News> data) {
-        if(mData==null){
+//        if(mData==null){
             mData = data;
             notifyDataSetChanged();
-        } else {
-            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-                @Override
-                public int getOldListSize() {
-                    return mData.size();
-                }
-
-                @Override
-                public int getNewListSize() {
-                    return data.size();
-                }
-
-                @Override
-                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    if(oldItemPosition==0&&newItemPosition==0)return true;
-                    if((oldItemPosition==0)^(newItemPosition==0)) return false;
-                    if(newItemPosition>data.size()||oldItemPosition>data.size()) return false;
-                    return mData.get(oldItemPosition-1).getId().equals(data.get(newItemPosition-1).getId());
-                }
-
-                @Override
-                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    if(oldItemPosition==0&&newItemPosition==0)return true;
-                    if((oldItemPosition==0)^(newItemPosition==0)) return false;
-                    if(newItemPosition>data.size()||oldItemPosition>data.size()) return false;
-                    News oldProduct = mData.get(oldItemPosition-1);
-                    News newProduct = data.get(newItemPosition-1);
-                    if(oldProduct==null || newProduct==null) return false;
-                    if(newProduct.getLongId()==null)
-                        System.out.println("oops!");
-                    return newProduct.getLongId().equals(oldProduct.getLongId());
-                }
-            });
-            mData = data;
-            result.dispatchUpdatesTo(this);
-        }
+//        } else {
+//            List<News> old = mData;
+//            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+//                @Override
+//                public int getOldListSize() {
+//                    return old.size();
+//                }
+//
+//                @Override
+//                public int getNewListSize() {
+//                    return data.size();
+//                }
+//
+//                @Override
+//                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+//                    if(oldItemPosition==0&&newItemPosition==0)return true;
+//                    if((oldItemPosition==0)^(newItemPosition==0)) return false;
+//                    if(newItemPosition>=data.size()||oldItemPosition>=old.size()) return false;
+//                    return old.get(oldItemPosition-1).getId().equals(data.get(newItemPosition-1).getId());
+//                }
+//
+//                @Override
+//                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+//                    if(oldItemPosition==0&&newItemPosition==0)return true;
+//                    if((oldItemPosition==0)^(newItemPosition==0)) return false;
+//                    if(newItemPosition>=data.size()||oldItemPosition>=old.size()) return false;
+//                    News oldProduct = old.get(oldItemPosition-1);
+//                    News newProduct = data.get(newItemPosition-1);
+//                    if(oldProduct==null || newProduct==null) return false;
+//                    if(newProduct.getLongId()==null)
+//                        System.out.println("oops!");
+//                    return newProduct.getLongId().equals(oldProduct.getLongId());
+//                }
+//            });
+//            mData = data;
+//            result.dispatchUpdatesTo(this);
+//        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{

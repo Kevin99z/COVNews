@@ -1,8 +1,10 @@
-package com.example.cov_news;
+package com.example.cov_news.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.cov_news.Constants;
+import com.example.cov_news.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.sina.weibo.sdk.WbSdk;
 import com.sina.weibo.sdk.api.TextObject;
@@ -20,9 +22,6 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
